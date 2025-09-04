@@ -1,0 +1,1 @@
+ALTER TABLE "ai_service" DROP COLUMN "test_var";

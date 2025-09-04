@@ -1,0 +1,84 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/services/services",
+    "pages/orders/orders",
+    "pages/profile/profile",
+    "pages/login/login",
+    "pages/service-form/service-form",
+    "pages/order-detail/order-detail",
+    "pages/task-progress/task-progress",
+    "pages/result/result",
+    "pages/feedback/feedback",
+    "pages/personal-info/personal-info",
+    "pages/consent/consent"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1976D2",
+    "navigationBarTitleText": "DR.Agent",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F5F5",
+    "enablePullDownRefresh": true,
+    "onReachBottomDistance": 50
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#1976D2",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "position": "bottom",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/services/services",
+        "iconPath": "images/services.png",
+        "selectedIconPath": "images/services-active.png",
+        "text": "医疗服务"
+      },
+      {
+        "pagePath": "pages/orders/orders",
+        "iconPath": "images/orders.png",
+        "selectedIconPath": "images/orders-active.png",
+        "text": "我的订单"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "iconPath": "images/profile.png",
+        "selectedIconPath": "images/profile-active.png",
+        "text": "个人中心"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "downloadFile": 10000
+  },
+  "debug": false,
+  "permission": {
+    "scope.userInfo": {
+      "desc": "用于完善用户资料"
+    },
+    "scope.camera": {
+      "desc": "用于上传医疗相关图片"
+    },
+    "scope.album": {
+      "desc": "用于选择医疗相关图片"
+    }
+  },
+  "requiredBackgroundModes": [],
+  "plugins": {},
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": []
+    }
+  },
+  "entryPagePath": "pages/index/index",
+  "sitemapLocation": "sitemap.json"
+}

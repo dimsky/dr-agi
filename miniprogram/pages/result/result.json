@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "结果查看",
+  "navigationBarBackgroundColor": "#1976D2",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#F5F5F5",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50,
+  "backgroundTextStyle": "dark"
+}

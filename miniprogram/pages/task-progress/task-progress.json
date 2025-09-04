@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "任务进度",
+  "navigationBarBackgroundColor": "#1976D2",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#F5F5F5",
+  "enablePullDownRefresh": false,
+  "onReachBottomDistance": 50,
+  "backgroundTextStyle": "dark"
+}

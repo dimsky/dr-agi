@@ -1,0 +1,211 @@
+<!--result.wxml-->
+<view class="container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载结果中...</text>
+  </view>
+
+  <!-- 错误状态 -->
+  <view wx:elif="{{error}}" class="error-container">
+    <view class="error-icon">❌</view>
+    <text class="error-text">{{error}}</text>
+    <button class="retry-btn" bindtap="onRetry">重试</button>
+  </view>
+
+  <!-- 结果内容 -->
+  <view wx:else class="result-content">
+    <!-- 结果头部信息 -->
+    <view class="result-header">
+      <view class="header-title">
+        <text class="service-name">{{resultInfo.serviceName}}</text>
+        <text class="completion-badge">已完成</text>
+      </view>
+      <view class="header-info">
+        <text class="task-id">任务ID: {{resultInfo.taskId}}</text>
+        <text class="completion-time">完成时间: {{resultInfo.completedTime}}</text>
+        <text class="execution-time">耗时: {{resultInfo.executionTime}}</text>
+      </view>
+    </view>
+
+    <!-- 结果摘要 -->
+    <view wx:if="{{resultContent.summary}}" class="result-summary">
+      <view class="summary-header">
+        <text class="summary-title">📋 结果摘要</text>
+      </view>
+      <text class="summary-content">{{resultContent.summary}}</text>
+    </view>
+
+    <!-- 文本结果 -->
+    <view wx:if="{{resultContent.textContent && resultType !== 'mixed'}}" class="text-result">
+      <view class="result-section-header">
+        <text class="section-title">📄 分析报告</text>
+        <button class="copy-btn" bindtap="onCopyText">复制</button>
+      </view>
+      <view class="text-content">
+        <text class="text-body">{{resultContent.textContent}}</text>
+      </view>
+    </view>
+
+    <!-- 混合结果展示 -->
+    <view wx:if="{{resultType === 'mixed'}}" class="mixed-result">
+      <!-- 文本部分 -->
+      <view wx:if="{{resultContent.textContent}}" class="result-section">
+        <view class="result-section-header">
+          <text class="section-title">📄 文字报告</text>
+          <button class="copy-btn" bindtap="onCopyText">复制</button>
+        </view>
+        <view class="text-content">
+          <text class="text-body">{{resultContent.textContent}}</text>
+        </view>
+      </view>
+
+      <!-- 图片部分 -->
+      <view wx:if="{{resultContent.images.length > 0}}" class="result-section">
+        <view class="result-section-header">
+          <text class="section-title">🖼️ 图片结果</text>
+        </view>
+        <view class="images-grid">
+          <view wx:for="{{resultContent.images}}" wx:key="index" class="image-item">
+            <image 
+              class="result-image" 
+              src="{{item.url}}" 
+              mode="aspectFill"
+              data-current="{{item.url}}"
+              bindtap="onPreviewImage"
+            ></image>
+            <view wx:if="{{item.title}}" class="image-title">{{item.title}}</view>
+            <view wx:if="{{item.description}}" class="image-desc">{{item.description}}</view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 文件部分 -->
+      <view wx:if="{{resultContent.files.length > 0}}" class="result-section">
+        <view class="result-section-header">
+          <text class="section-title">📎 文件附件</text>
+        </view>
+        <view class="files-list">
+          <view wx:for="{{resultContent.files}}" wx:key="index" class="file-item">
+            <view class="file-info">
+              <text class="file-name">{{item.name}}</text>
+              <text class="file-size">{{item.size || '未知大小'}}</text>
+            </view>
+            <button 
+              class="download-btn" 
+              data-url="{{item.url}}" 
+              data-name="{{item.name}}"
+              bindtap="onDownloadFile"
+            >
+              下载
+            </button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 纯图片结果 -->
+    <view wx:if="{{resultType === 'image' && resultContent.images.length > 0}}" class="image-result">
+      <view class="result-section-header">
+        <text class="section-title">🖼️ 图片分析结果</text>
+      </view>
+      <view class="images-grid">
+        <view wx:for="{{resultContent.images}}" wx:key="index" class="image-item">
+          <image 
+            class="result-image large" 
+            src="{{item.url}}" 
+            mode="aspectFill"
+            data-current="{{item.url}}"
+            bindtap="onPreviewImage"
+          ></image>
+          <view wx:if="{{item.title}}" class="image-title">{{item.title}}</view>
+          <view wx:if="{{item.description}}" class="image-desc">{{item.description}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- PDF结果 -->
+    <view wx:if="{{resultType === 'pdf' && resultContent.pdfUrl}}" class="pdf-result">
+      <view class="result-section-header">
+        <text class="section-title">📋 PDF报告</text>
+      </view>
+      <view class="pdf-preview">
+        <view class="pdf-icon">📄</view>
+        <text class="pdf-title">分析报告.pdf</text>
+        <button 
+          class="download-btn primary" 
+          data-url="{{resultContent.pdfUrl}}" 
+          data-name="分析报告.pdf"
+          bindtap="onDownloadFile"
+        >
+          查看PDF报告
+        </button>
+      </view>
+    </view>
+
+    <!-- 操作按钮区域 -->
+    <view class="action-section">
+      <view class="action-buttons">
+        <button class="action-btn share-btn" bindtap="onShareResult">
+          <text class="btn-icon">🔗</text>
+          <text class="btn-text">分享结果</text>
+        </button>
+        
+        <button class="action-btn rating-btn" bindtap="onShowRating">
+          <text class="btn-icon">⭐</text>
+          <text class="btn-text">{{hasRated ? '已评价' : '满意度评价'}}</text>
+        </button>
+      </view>
+      
+      <button class="back-btn" bindtap="onGoBack">返回</button>
+    </view>
+  </view>
+
+  <!-- 评价弹窗 -->
+  <view wx:if="{{ratingVisible}}" class="rating-modal">
+    <view class="modal-overlay" bindtap="onHideRating"></view>
+    <view class="modal-content">
+      <view class="modal-header">
+        <text class="modal-title">服务满意度评价</text>
+        <view class="close-btn" bindtap="onHideRating">✕</view>
+      </view>
+      
+      <view class="rating-section">
+        <text class="rating-label">请为本次服务打分：</text>
+        <view class="rating-stars">
+          <view 
+            wx:for="{{[1,2,3,4,5]}}" 
+            wx:key="*this"
+            class="star {{currentRating >= item ? 'active' : ''}}"
+            data-rating="{{item}}"
+            bindtap="onSelectRating"
+          >
+            ⭐
+          </view>
+        </view>
+        <text class="rating-desc">
+          {{currentRating === 5 ? '非常满意' : 
+            currentRating === 4 ? '满意' : 
+            currentRating === 3 ? '一般' : 
+            currentRating === 2 ? '不满意' : '非常不满意'}}
+        </text>
+      </view>
+      
+      <view class="comment-section">
+        <text class="comment-label">意见建议（可选）：</text>
+        <textarea 
+          class="comment-input" 
+          placeholder="请分享您的使用体验和建议..."
+          value="{{ratingComment}}"
+          bindinput="onRatingInput"
+          maxlength="500"
+        ></textarea>
+      </view>
+      
+      <view class="modal-actions">
+        <button class="cancel-btn" bindtap="onHideRating">取消</button>
+        <button class="submit-btn" bindtap="onSubmitRating">提交评价</button>
+      </view>
+    </view>
+  </view>
+</view>

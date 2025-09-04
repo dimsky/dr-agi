@@ -1,0 +1,161 @@
+<view class="service-form-container">
+  <!-- 表单标题 -->
+  <view wx:if="{{formSchema}}" class="form-header">
+    <text class="form-title">{{formSchema.title}}</text>
+  </view>
+
+  <!-- 动态表单内容 -->
+  <view wx:if="{{formSchema}}" class="form-content">
+    <view wx:for="{{formSchema.fields}}" wx:key="key" class="form-field">
+      
+      <!-- 文本输入框 -->
+      <view wx:if="{{item.type === 'text'}}" class="field-group">
+        <view class="field-label">
+          <text>{{item.label}}</text>
+          <text wx:if="{{item.required}}" class="required">*</text>
+        </view>
+        <input
+          class="field-input {{formErrors[item.key] ? 'error' : ''}}"
+          placeholder="{{item.placeholder}}"
+          value="{{formData[item.key]}}"
+          maxlength="{{item.maxLength || -1}}"
+          data-field="{{item.key}}"
+          bindinput="onInputChange"
+        />
+        <view wx:if="{{formErrors[item.key]}}" class="error-message">
+          {{formErrors[item.key]}}
+        </view>
+      </view>
+
+      <!-- 多行文本框 -->
+      <view wx:elif="{{item.type === 'textarea'}}" class="field-group">
+        <view class="field-label">
+          <text>{{item.label}}</text>
+          <text wx:if="{{item.required}}" class="required">*</text>
+        </view>
+        <textarea
+          class="field-textarea {{formErrors[item.key] ? 'error' : ''}}"
+          placeholder="{{item.placeholder}}"
+          value="{{formData[item.key]}}"
+          maxlength="{{item.maxLength || -1}}"
+          data-field="{{item.key}}"
+          bindinput="onInputChange"
+          auto-height
+        />
+        <view wx:if="{{formErrors[item.key]}}" class="error-message">
+          {{formErrors[item.key]}}
+        </view>
+      </view>
+
+      <!-- 选择器 -->
+      <view wx:elif="{{item.type === 'picker'}}" class="field-group">
+        <view class="field-label">
+          <text>{{item.label}}</text>
+          <text wx:if="{{item.required}}" class="required">*</text>
+        </view>
+        <picker
+          class="field-picker {{formErrors[item.key] ? 'error' : ''}}"
+          range="{{item.options}}"
+          data-field="{{item.key}}"
+          data-options="{{item.options}}"
+          bindchange="onPickerChange"
+        >
+          <view class="picker-content">
+            <text class="{{formData[item.key] ? 'selected' : 'placeholder'}}">
+              {{formData[item.key] || '请选择' + item.label}}
+            </text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+        <view wx:if="{{formErrors[item.key]}}" class="error-message">
+          {{formErrors[item.key]}}
+        </view>
+      </view>
+
+      <!-- 文件上传 -->
+      <view wx:elif="{{item.type === 'file'}}" class="field-group">
+        <view class="field-label">
+          <text>{{item.label}}</text>
+          <text wx:if="{{item.required}}" class="required">*</text>
+        </view>
+        
+        <!-- 上传按钮 -->
+        <view class="file-upload-section">
+          <button
+            class="upload-btn {{formErrors[item.key] ? 'error' : ''}}"
+            data-field="{{item.key}}"
+            bindtap="onFileUpload"
+          >
+            <text class="upload-icon">📎</text>
+            <text>选择文件</text>
+          </button>
+          
+          <!-- 文件提示 -->
+          <view class="upload-tips">
+            <text>支持图片、PDF、Word文档，最大50MB</text>
+          </view>
+        </view>
+
+        <!-- 已上传的文件列表 -->
+        <view wx:if="{{uploadedFiles[item.key] && uploadedFiles[item.key].length > 0}}" class="uploaded-files">
+          <view wx:for="{{uploadedFiles[item.key]}}" wx:key="url" wx:for-item="file" wx:for-index="fileIndex" class="file-item">
+            <view class="file-info">
+              <text class="file-icon">📄</text>
+              <text class="file-name">{{file.name}}</text>
+              <text class="file-size">{{file.size > 1024 * 1024 ? (file.size / 1024 / 1024).toFixed(1) + 'MB' : (file.size / 1024).toFixed(1) + 'KB'}}</text>
+            </view>
+            <button
+              class="remove-btn"
+              data-field="{{item.key}}"
+              data-index="{{fileIndex}}"
+              bindtap="onRemoveFile"
+            >
+              ×
+            </button>
+          </view>
+        </view>
+
+        <view wx:if="{{formErrors[item.key]}}" class="error-message">
+          {{formErrors[item.key]}}
+        </view>
+      </view>
+
+      <!-- 数字输入 -->
+      <view wx:elif="{{item.type === 'number'}}" class="field-group">
+        <view class="field-label">
+          <text>{{item.label}}</text>
+          <text wx:if="{{item.required}}" class="required">*</text>
+        </view>
+        <input
+          class="field-input {{formErrors[item.key] ? 'error' : ''}}"
+          placeholder="{{item.placeholder}}"
+          value="{{formData[item.key]}}"
+          type="number"
+          data-field="{{item.key}}"
+          bindinput="onInputChange"
+        />
+        <view wx:if="{{formErrors[item.key]}}" class="error-message">
+          {{formErrors[item.key]}}
+        </view>
+      </view>
+
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view wx:if="{{formSchema}}" class="form-actions">
+    <button
+      class="submit-btn {{isValid ? 'enabled' : 'disabled'}}"
+      disabled="{{!isValid || isSubmitting}}"
+      loading="{{isSubmitting}}"
+      bindtap="onSubmit"
+    >
+      {{isSubmitting ? '提交中...' : '提交'}}
+    </button>
+  </view>
+
+  <!-- 无表单提示 -->
+  <view wx:else class="no-form-tip">
+    <text>请选择服务或配置表单</text>
+  </view>
+</view>

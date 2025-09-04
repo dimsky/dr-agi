@@ -1,0 +1,6 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "医疗服务",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#F5F5F5"
+}

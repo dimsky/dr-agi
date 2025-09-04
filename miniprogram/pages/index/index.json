@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "DR.Agent",
+  "navigationBarBackgroundColor": "#1976D2",
+  "navigationBarTextStyle": "white",
+  "backgroundColor": "#F5F5F5",
+  "backgroundTextStyle": "light",
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 50,
+  "backgroundColorTop": "#1976D2",
+  "backgroundColorBottom": "#F5F5F5"
+}

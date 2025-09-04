@@ -1,0 +1,160 @@
+<!--index.wxml-->
+<view class="container">
+  <!-- 欢迎横幅 -->
+  <view class="welcome-banner">
+    <view class="banner-gradient">
+      <view class="welcome-content">
+        <view class="platform-logo">🏥</view>
+        <view class="welcome-title">DR.Agent AI 医学服务平台</view>
+        <view class="welcome-subtitle">专业AI赋能 · 智慧医疗服务</view>
+        <view class="welcome-description">为医疗专业人士提供7大核心AI服务</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 用户状态卡片 -->
+  <view class="user-status-card">
+    <view wx:if="{{isLoggedIn}}" class="user-info-section">
+      <view class="user-avatar">👨‍⚕️</view>
+      <view class="user-details">
+        <view class="user-greeting">您好，{{userInfo.name || '医生'}}</view>
+        <view class="user-subtitle">欢迎回到医疗服务平台</view>
+      </view>
+      <view class="user-actions">
+        <button class="action-btn" bindtap="onViewProfile">个人中心</button>
+      </view>
+    </view>
+    
+    <view wx:else class="login-prompt-section">
+      <view class="login-icon">🔑</view>
+      <view class="login-content">
+        <view class="login-title">登录体验完整服务</view>
+        <view class="login-subtitle">获取个性化医疗AI服务</view>
+      </view>
+      <view class="login-actions">
+        <button class="login-btn" bindtap="onLogin">立即登录</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 平台数据展示 -->
+  <view class="platform-stats">
+    <view class="stats-title">平台数据</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-number">{{platformStats.totalUsers}}</view>
+        <view class="stat-label">注册医生</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{platformStats.totalServices}}</view>
+        <view class="stat-label">专业服务</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-number">{{platformStats.successRate}}</view>
+        <view class="stat-label">满意度</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速入口 -->
+  <view class="quick-entry-section">
+    <view class="section-header">
+      <view class="section-title">快速入口</view>
+      <view class="section-subtitle">选择您需要的专业服务</view>
+    </view>
+    
+    <view class="entry-actions">
+      <button class="primary-entry-btn" bindtap="onNavigateToServices">
+        <view class="entry-icon">🔍</view>
+        <view class="entry-text">浏览所有服务</view>
+        <view class="entry-arrow">→</view>
+      </button>
+      
+      <view class="secondary-entries">
+        <button class="secondary-entry-btn" bindtap="onContactService">
+          <view class="entry-mini-icon">💬</view>
+          <view class="entry-mini-text">联系客服</view>
+        </button>
+        <button class="secondary-entry-btn" bindtap="onViewAllAnnouncements">
+          <view class="entry-mini-icon">📢</view>
+          <view class="entry-mini-text">最新公告</view>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐服务 -->
+  <view wx:if="{{recommendedServices.length > 0}}" class="recommended-section">
+    <view class="section-header">
+      <view class="section-title">热门推荐</view>
+      <view class="section-subtitle">精选优质医疗服务</view>
+    </view>
+    
+    <view class="recommended-services">
+      <view 
+        wx:for="{{recommendedServices}}" 
+        wx:key="id" 
+        class="recommended-item {{item.hot ? 'hot-service' : ''}}"
+        bindtap="onSelectRecommendedService" 
+        data-service="{{item}}"
+      >
+        <view class="recommended-icon">{{item.icon}}</view>
+        <view class="recommended-content">
+          <view class="recommended-name">{{item.name}}</view>
+          <view class="recommended-description">{{item.description}}</view>
+        </view>
+        <view class="recommended-meta">
+          <view class="recommended-price">￥{{item.price}}</view>
+          <view wx:if="{{item.hot}}" class="hot-badge">🔥</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 最新公告 -->
+  <view wx:if="{{announcements.length > 0}}" class="announcements-section">
+    <view class="section-header">
+      <view class="section-title">最新公告</view>
+      <view class="section-more" bindtap="onViewAllAnnouncements">查看全部 →</view>
+    </view>
+    
+    <view class="announcements-list">
+      <view 
+        wx:for="{{announcements}}" 
+        wx:key="id" 
+        class="announcement-item {{item.type}}"
+      >
+        <view class="announcement-header">
+          <view class="announcement-title">{{item.title}}</view>
+          <view class="announcement-time">{{item.time}}</view>
+        </view>
+        <view class="announcement-content">{{item.content}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-overlay">
+    <view class="loading-spinner"></view>
+    <view class="loading-text">加载中...</view>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="footer-info">
+    <view class="info-card">
+      <view class="info-icon">🛡️</view>
+      <view class="info-content">
+        <view class="info-title">数据安全保障</view>
+        <view class="info-desc">采用银行级加密技术，保护您的隐私数据</view>
+      </view>
+    </view>
+    
+    <view class="info-card">
+      <view class="info-icon">⚡</view>
+      <view class="info-content">
+        <view class="info-title">AI技术支持</view>
+        <view class="info-desc">基于先进的Dify工作流，提供智能医疗服务</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,116 @@
+<!--task-progress.wxml-->
+<view class="container">
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载任务信息中...</text>
+  </view>
+
+  <!-- 错误状态 -->
+  <view wx:elif="{{error}}" class="error-container">
+    <view class="error-icon">❌</view>
+    <text class="error-text">{{error}}</text>
+    <button class="retry-btn" bindtap="onRetry">重试</button>
+  </view>
+
+  <!-- 任务进度内容 -->
+  <view wx:else class="progress-content">
+    <!-- 任务信息卡片 -->
+    <view class="task-card">
+      <view class="task-header">
+        <view class="task-title">{{taskInfo.serviceName}}</view>
+        <view class="task-id">任务ID: {{taskInfo.taskId}}</view>
+      </view>
+      
+      <view class="task-details">
+        <view class="detail-item">
+          <text class="detail-label">订单编号:</text>
+          <text class="detail-value">{{taskInfo.orderId}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">创建时间:</text>
+          <text class="detail-value">{{taskInfo.createdTime}}</text>
+        </view>
+        <view class="detail-item">
+          <text class="detail-label">预计时长:</text>
+          <text class="detail-value">{{taskInfo.estimatedDuration}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 进度指示器 -->
+    <view class="progress-indicator">
+      <view class="progress-header">
+        <text class="progress-title">执行进度</text>
+        <text class="progress-percentage">{{progressPercentage}}%</text>
+      </view>
+      
+      <!-- 进度条 -->
+      <view class="progress-bar-container">
+        <view class="progress-bar">
+          <view class="progress-fill" style="width: {{progressPercentage}}%"></view>
+        </view>
+      </view>
+
+      <!-- 状态信息 -->
+      <view class="status-info">
+        <view class="status-item {{taskStatus === 'pending' ? 'active' : taskStatus === 'running' || taskStatus === 'completed' ? 'completed' : ''}}">
+          <view class="status-dot"></view>
+          <text class="status-text">任务排队</text>
+        </view>
+        <view class="status-item {{taskStatus === 'running' ? 'active' : taskStatus === 'completed' ? 'completed' : ''}}">
+          <view class="status-dot"></view>
+          <text class="status-text">AI处理中</text>
+        </view>
+        <view class="status-item {{taskStatus === 'completed' ? 'active completed' : ''}}">
+          <view class="status-dot"></view>
+          <text class="status-text">处理完成</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 当前状态描述 -->
+    <view class="status-description">
+      <view class="status-icon">{{statusIcon}}</view>
+      <view class="status-content">
+        <text class="status-title">{{statusTitle}}</text>
+        <text class="status-message">{{statusMessage}}</text>
+      </view>
+    </view>
+
+    <!-- 执行时间信息 -->
+    <view wx:if="{{taskInfo.startedAt}}" class="time-info">
+      <view class="time-item">
+        <text class="time-label">开始时间:</text>
+        <text class="time-value">{{taskInfo.startedTime}}</text>
+      </view>
+      <view wx:if="{{taskInfo.completedAt}}" class="time-item">
+        <text class="time-label">完成时间:</text>
+        <text class="time-value">{{taskInfo.completedTime}}</text>
+      </view>
+      <view wx:if="{{taskInfo.executionTime}}" class="time-item">
+        <text class="time-label">执行耗时:</text>
+        <text class="time-value">{{taskInfo.executionTime}}</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-buttons">
+      <button wx:if="{{taskStatus === 'completed'}}" 
+              class="primary-btn" 
+              bindtap="onViewResult">
+        查看结果
+      </button>
+      
+      <button wx:if="{{taskStatus === 'failed'}}" 
+              class="retry-btn" 
+              bindtap="onRetryTask">
+        重新执行
+      </button>
+      
+      <button class="secondary-btn" bindtap="onBackToOrders">
+        返回订单
+      </button>
+    </view>
+  </view>
+</view>

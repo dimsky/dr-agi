@@ -1,0 +1,138 @@
+<!--订单支付组件模板-->
+<view class="order-payment" wx:if="{{visible}}">
+  
+  <!-- 加载状态 -->
+  <view class="loading-mask" wx:if="{{isLoading}}">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <view class="loading-text">
+        {{isCreatingOrder ? '正在准备订单...' : (isProcessingPayment ? '处理支付中...' : '加载中...')}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="order-info" wx:if="{{orderInfo && !isLoading}}">
+    <view class="info-header">
+      <text class="header-title">订单详情</text>
+      <view class="payment-status {{paymentStatus}}">
+        {{getPaymentStatusText(paymentStatus)}}
+      </view>
+    </view>
+
+    <!-- 服务信息 -->
+    <view class="service-info">
+      <view class="service-name">{{orderInfo.serviceName}}</view>
+      <view class="service-description" wx:if="{{orderInfo.serviceDescription}}">
+        {{orderInfo.serviceDescription}}
+      </view>
+    </view>
+
+    <!-- 订单号 -->
+    <view class="order-number" wx:if="{{orderInfo.orderNumber}}">
+      <text class="label">订单号：</text>
+      <text class="value">{{orderInfo.orderNumber}}</text>
+    </view>
+
+    <!-- 金额信息 -->
+    <view class="amount-info">
+      <view class="amount-row">
+        <text class="amount-label">服务费用</text>
+        <text class="amount-value">¥{{formatAmount(orderInfo.amount)}}</text>
+      </view>
+      <view class="total-amount">
+        <text class="total-label">实付金额</text>
+        <text class="total-value">¥{{formatAmount(orderInfo.amount)}}</text>
+      </view>
+    </view>
+
+    <!-- 交易信息 -->
+    <view class="transaction-info" wx:if="{{orderInfo.transactionId}}">
+      <view class="transaction-row">
+        <text class="label">交易号：</text>
+        <text class="value">{{orderInfo.transactionId}}</text>
+      </view>
+      <view class="transaction-row" wx:if="{{orderInfo.paidAt}}">
+        <text class="label">支付时间：</text>
+        <text class="value">{{orderInfo.paidAt}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 错误信息 -->
+  <view class="error-message" wx:if="{{errorMessage && !isLoading}}">
+    <view class="error-icon">⚠️</view>
+    <view class="error-text">{{errorMessage}}</view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="payment-actions" wx:if="{{orderInfo && !isLoading}}">
+    
+    <!-- 支付成功状态 -->
+    <view class="success-actions" wx:if="{{paymentStatus === 'success'}}">
+      <view class="success-icon">✅</view>
+      <view class="success-text">支付成功！您的订单正在处理中</view>
+      <button class="action-btn primary" bindtap="onViewOrder">查看订单</button>
+    </view>
+
+    <!-- 待支付状态 -->
+    <view class="pending-actions" wx:elif="{{paymentStatus === 'pending'}}">
+      <button 
+        class="action-btn primary" 
+        bindtap="createOrder"
+        disabled="{{isProcessingPayment}}"
+      >
+        {{isProcessingPayment ? '处理中...' : '立即支付'}}
+      </button>
+      <button class="action-btn secondary" bindtap="onCancelPayment">取消订单</button>
+    </view>
+
+    <!-- 支付中状态 -->
+    <view class="paying-actions" wx:elif="{{paymentStatus === 'paying'}}">
+      <view class="paying-icon">💳</view>
+      <view class="paying-text">正在处理支付，请稍候...</view>
+      <view class="paying-progress">
+        <view class="progress-bar">
+          <view class="progress-fill"></view>
+        </view>
+        <view class="progress-text">第{{paymentCheckCount}}次检查支付状态</view>
+      </view>
+    </view>
+
+    <!-- 支付失败状态 -->
+    <view class="failed-actions" wx:elif="{{paymentStatus === 'failed'}}">
+      <button 
+        class="action-btn primary" 
+        bindtap="onRetryPayment"
+        disabled="{{isProcessingPayment}}"
+      >
+        重新支付
+      </button>
+      <button class="action-btn secondary" bindtap="onCancelPayment">取消订单</button>
+    </view>
+
+    <!-- 支付取消状态 -->
+    <view class="cancelled-actions" wx:elif="{{paymentStatus === 'cancelled'}}">
+      <view class="cancelled-icon">🚫</view>
+      <view class="cancelled-text">支付已取消</view>
+      <button 
+        class="action-btn primary" 
+        bindtap="onRetryPayment"
+        disabled="{{isProcessingPayment}}"
+      >
+        重新支付
+      </button>
+      <button class="action-btn secondary" bindtap="onCancelPayment">关闭</button>
+    </view>
+  </view>
+
+  <!-- 支付说明 -->
+  <view class="payment-notice" wx:if="{{orderInfo && !isLoading}}">
+    <view class="notice-title">支付说明</view>
+    <view class="notice-content">
+      <view class="notice-item">• 支付成功后，我们将立即开始处理您的服务请求</view>
+      <view class="notice-item">• 处理完成后会通过微信通知您结果</view>
+      <view class="notice-item">• 如有疑问，请联系客服</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,433 @@
+/* 订单支付组件样式 */
+
+.order-payment {
+  position: relative;
+  background: #f7f7f7;
+  min-height: 100vh;
+}
+
+/* 加载遮罩 */
+.loading-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  background: white;
+  padding: 60rpx;
+  border-radius: 20rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid #e5e5e5;
+  border-top: 6rpx solid #07c160;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 20rpx;
+  color: #666;
+  font-size: 28rpx;
+}
+
+/* 订单信息 */
+.order-info {
+  background: white;
+  margin: 20rpx;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.header-title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.payment-status {
+  padding: 10rpx 20rpx;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  font-weight: bold;
+}
+
+.payment-status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.payment-status.paying {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.payment-status.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.payment-status.failed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.payment-status.cancelled {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* 服务信息 */
+.service-info {
+  margin-bottom: 30rpx;
+}
+
+.service-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.service-description {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 订单号 */
+.order-number {
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 10rpx;
+}
+
+.order-number .label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.order-number .value {
+  font-size: 28rpx;
+  color: #333;
+  font-family: monospace;
+}
+
+/* 金额信息 */
+.amount-info {
+  margin-bottom: 30rpx;
+  padding: 20rpx;
+  background: #f8f9fa;
+  border-radius: 10rpx;
+}
+
+.amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.amount-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.amount-value {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.total-amount {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15rpx;
+  border-top: 2rpx solid #e9ecef;
+}
+
+.total-label {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.total-value {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #e64340;
+}
+
+/* 交易信息 */
+.transaction-info {
+  margin-bottom: 20rpx;
+  padding: 20rpx;
+  background: #f0f9ff;
+  border-radius: 10rpx;
+  border-left: 6rpx solid #07c160;
+}
+
+.transaction-row {
+  display: flex;
+  margin-bottom: 10rpx;
+}
+
+.transaction-row:last-child {
+  margin-bottom: 0;
+}
+
+.transaction-row .label {
+  font-size: 26rpx;
+  color: #666;
+  min-width: 140rpx;
+}
+
+.transaction-row .value {
+  font-size: 26rpx;
+  color: #333;
+  flex: 1;
+  font-family: monospace;
+}
+
+/* 错误信息 */
+.error-message {
+  background: white;
+  margin: 20rpx;
+  padding: 40rpx;
+  border-radius: 20rpx;
+  display: flex;
+  align-items: center;
+  border-left: 6rpx solid #e64340;
+}
+
+.error-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.error-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #e64340;
+  line-height: 1.5;
+}
+
+/* 操作按钮区域 */
+.payment-actions {
+  background: white;
+  margin: 20rpx;
+  padding: 40rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+/* 成功状态 */
+.success-actions {
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.success-text {
+  font-size: 32rpx;
+  color: #155724;
+  margin-bottom: 40rpx;
+  line-height: 1.5;
+}
+
+/* 待支付状态 */
+.pending-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+/* 支付中状态 */
+.paying-actions {
+  text-align: center;
+}
+
+.paying-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.paying-text {
+  font-size: 32rpx;
+  color: #0c5460;
+  margin-bottom: 30rpx;
+}
+
+.paying-progress {
+  margin-bottom: 20rpx;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8rpx;
+  background: #e9ecef;
+  border-radius: 4rpx;
+  overflow: hidden;
+  margin-bottom: 15rpx;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #07c160, #38ef7d);
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+
+.progress-text {
+  font-size: 24rpx;
+  color: #666;
+}
+
+/* 失败状态 */
+.failed-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+/* 取消状态 */
+.cancelled-actions {
+  text-align: center;
+}
+
+.cancelled-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.cancelled-text {
+  font-size: 32rpx;
+  color: #383d41;
+  margin-bottom: 40rpx;
+}
+
+.cancelled-actions .action-btn {
+  margin-top: 20rpx;
+}
+
+/* 按钮样式 */
+.action-btn {
+  width: 100%;
+  padding: 28rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #07c160, #38ef7d);
+  color: white;
+}
+
+.action-btn.primary:disabled {
+  background: #cccccc;
+  color: #666666;
+}
+
+.action-btn.secondary {
+  background: white;
+  color: #666;
+  border: 2rpx solid #e9ecef;
+}
+
+.action-btn.secondary:active {
+  background: #f8f9fa;
+}
+
+/* 支付说明 */
+.payment-notice {
+  background: white;
+  margin: 20rpx;
+  padding: 40rpx;
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.notice-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20rpx;
+}
+
+.notice-content {
+  line-height: 1.6;
+}
+
+.notice-item {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.notice-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 响应式调整 */
+@media (max-width: 375px) {
+  .order-info,
+  .payment-actions,
+  .payment-notice {
+    margin: 15rpx;
+    padding: 30rpx;
+  }
+  
+  .header-title {
+    font-size: 32rpx;
+  }
+  
+  .service-name {
+    font-size: 28rpx;
+  }
+  
+  .total-value {
+    font-size: 32rpx;
+  }
+}

@@ -1,0 +1,62 @@
+<!--services.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">选择医疗服务</text>
+    <text class="page-subtitle">请选择您需要的专业医疗服务</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 错误状态 -->
+  <view wx:elif="{{error}}" class="error-container">
+    <view class="error-icon">⚠️</view>
+    <text class="error-text">{{error}}</text>
+    <button class="retry-button" bindtap="onRetry">重试</button>
+  </view>
+
+  <!-- 服务列表 -->
+  <view wx:else class="services-list">
+    <view 
+      wx:for="{{services}}" 
+      wx:key="id" 
+      class="service-item" 
+      bindtap="onServiceSelect" 
+      data-service="{{item}}"
+    >
+      <view class="service-icon">
+        <text>{{item.icon}}</text>
+      </view>
+      <view class="service-content">
+        <view class="service-title">{{item.name}}</view>
+        <view class="service-description">{{item.description}}</view>
+        <view class="service-features">
+          <text wx:for="{{item.features}}" wx:for-item="feature" wx:key="*this" class="feature-tag">
+            {{feature}}
+          </text>
+        </view>
+      </view>
+      <view class="service-meta">
+        <view class="service-price">￥{{item.price}}</view>
+        <view class="service-duration">{{item.duration}}</view>
+        <view class="arrow-icon">→</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部说明 -->
+  <view class="footer-info">
+    <view class="info-item">
+      <text class="info-icon">ℹ️</text>
+      <text class="info-text">所有服务均由专业医师团队提供</text>
+    </view>
+    <view class="info-item">
+      <text class="info-icon">🔒</text>
+      <text class="info-text">您的隐私和数据安全受到严格保护</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,359 @@
+/* task-progress.wxss */
+
+.container {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+  padding: 0;
+}
+
+/* 加载状态 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 40rpx;
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid #E3F2FD;
+  border-top: 6rpx solid #1976D2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 30rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: #666;
+  font-size: 28rpx;
+}
+
+/* 错误状态 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 40rpx;
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 120rpx;
+  margin-bottom: 30rpx;
+}
+
+.error-text {
+  color: #F44336;
+  font-size: 30rpx;
+  margin-bottom: 40rpx;
+  line-height: 1.6;
+}
+
+.retry-btn {
+  background-color: #1976D2;
+  color: white;
+  border-radius: 50rpx;
+  padding: 20rpx 60rpx;
+  font-size: 30rpx;
+  border: none;
+}
+
+.retry-btn:active {
+  background-color: #1565C0;
+}
+
+/* 进度内容 */
+.progress-content {
+  padding: 30rpx;
+}
+
+/* 任务信息卡片 */
+.task-card {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.task-header {
+  margin-bottom: 30rpx;
+}
+
+.task-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1976D2;
+  margin-bottom: 10rpx;
+}
+
+.task-id {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.task-details {
+  padding-top: 20rpx;
+  border-top: 2rpx solid #F0F0F0;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.detail-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.detail-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 进度指示器 */
+.progress-indicator {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.progress-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.progress-percentage {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #1976D2;
+}
+
+/* 进度条 */
+.progress-bar-container {
+  margin-bottom: 40rpx;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 16rpx;
+  background-color: #E3F2FD;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1976D2 0%, #2196F3 100%);
+  border-radius: 8rpx;
+  transition: width 0.3s ease;
+}
+
+/* 状态步骤 */
+.status-info {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+}
+
+.status-info::before {
+  content: '';
+  position: absolute;
+  top: 20rpx;
+  left: 40rpx;
+  right: 40rpx;
+  height: 4rpx;
+  background-color: #E0E0E0;
+  z-index: 1;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  z-index: 2;
+}
+
+.status-dot {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: #E0E0E0;
+  border: 6rpx solid white;
+  margin-bottom: 15rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.status-item.active .status-dot {
+  background-color: #FF9800;
+  animation: pulse 2s infinite;
+}
+
+.status-item.completed .status-dot {
+  background-color: #4CAF50;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15), 0 0 0 0 rgba(255, 152, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.15), 0 0 0 20rpx rgba(255, 152, 0, 0);
+  }
+}
+
+.status-text {
+  font-size: 24rpx;
+  color: #666;
+  text-align: center;
+}
+
+.status-item.active .status-text {
+  color: #FF9800;
+  font-weight: 600;
+}
+
+.status-item.completed .status-text {
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+/* 状态描述 */
+.status-description {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  display: flex;
+  align-items: flex-start;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.status-icon {
+  font-size: 60rpx;
+  margin-right: 25rpx;
+  line-height: 1;
+}
+
+.status-content {
+  flex: 1;
+}
+
+.status-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.status-message {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+  display: block;
+}
+
+/* 时间信息 */
+.time-info {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.time-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.time-item:last-child {
+  margin-bottom: 0;
+}
+
+.time-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.time-value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+/* 操作按钮 */
+.action-buttons {
+  padding: 20rpx 0;
+}
+
+.primary-btn, .secondary-btn {
+  width: 100%;
+  height: 100rpx;
+  line-height: 100rpx;
+  border-radius: 50rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+  border: none;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #1976D2 0%, #2196F3 100%);
+  color: white;
+  box-shadow: 0 8rpx 25rpx rgba(25, 118, 210, 0.3);
+}
+
+.primary-btn:active {
+  background: linear-gradient(135deg, #1565C0 0%, #1976D2 100%);
+  box-shadow: 0 4rpx 15rpx rgba(25, 118, 210, 0.4);
+}
+
+.secondary-btn {
+  background: white;
+  color: #1976D2;
+  border: 2rpx solid #1976D2;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+}
+
+.secondary-btn:active {
+  background: #F3F4F6;
+}
+
+.secondary-btn:last-child {
+  margin-bottom: 0;
+}
