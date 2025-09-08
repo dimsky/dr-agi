@@ -29,6 +29,7 @@ export const users = pgTable('users', {
   phone: varchar('phone', { length: 20 }),
   
   // 系统字段
+  role: varchar('role', { length: 20 }).notNull().default('user'), // 用户角色: user | admin
   registeredAt: timestamp('registered_at').notNull().defaultNow(),
   consentAgreedAt: timestamp('consent_agreed_at'),
   consentVersion: varchar('consent_version', { length: 20 }),
@@ -81,6 +82,14 @@ export interface CreateUserInput {
   consentVersion?: string;
 }
 
+// 用户角色枚举
+export const USER_ROLES = {
+  USER: 'user',
+  ADMIN: 'admin',
+} as const;
+
+export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
+
 // 用户更新输入类型
 export interface UpdateUserInput {
   nickname?: string;
@@ -88,6 +97,7 @@ export interface UpdateUserInput {
   email?: string;
   profession?: string;
   phone?: string;
+  role?: UserRole;
   lastLoginAt?: Date;
   isActive?: boolean;
 }

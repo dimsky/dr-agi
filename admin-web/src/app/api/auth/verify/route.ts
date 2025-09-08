@@ -134,24 +134,50 @@ export async function POST(request: NextRequest): Promise<NextResponse<TokenVeri
       });
     }
 
-    // 2. 查询用户信息
-    const user = await getUserById(tokenResult.payload!.userId);
+    // 2. 根据角色处理用户信息
+    const payload = tokenResult.payload!;
+    
+    if (payload.role === 'admin' && payload.username) {
+      // 对于管理员，直接返回管理员信息，无需查询数据库
+      console.log('✅ 管理员Token验证成功:', { username: payload.username, role: payload.role });
+      
+      return NextResponse.json({
+        success: true,
+        valid: true,
+        user: {
+          id: payload.username,
+          nickname: '系统管理员',
+          avatarUrl: '',
+          openId: '',
+          isActive: true,
+          lastLoginAt: null,
+        },
+      });
+    } else if (payload.role === 'user' && payload.userId) {
+      // 对于普通用户，查询数据库获取用户信息
+      const user = await getUserById(payload.userId);
+      
+      console.log('✅ 用户Token验证成功:', { userId: user.id, nickname: user.nickname });
 
-    console.log('✅ Token验证成功:', { userId: user.id, nickname: user.nickname });
-
-    // 3. 返回成功响应
-    return NextResponse.json({
-      success: true,
-      valid: true,
-      user: {
-        id: user.id,
-        nickname: user.nickname || '',
-        avatarUrl: user.avatarUrl || '',
-        openId: user.openId,
-        isActive: user.isActive,
-        lastLoginAt: user.lastLoginAt?.toISOString() || null,
-      },
-    });
+      return NextResponse.json({
+        success: true,
+        valid: true,
+        user: {
+          id: user.id,
+          nickname: user.nickname || '',
+          avatarUrl: user.avatarUrl || '',
+          openId: user.openId,
+          isActive: user.isActive,
+          lastLoginAt: user.lastLoginAt?.toISOString() || null,
+        },
+      });
+    } else {
+      return NextResponse.json({
+        success: true,
+        valid: false,
+        error: 'Token中缺少有效的用户标识',
+      });
+    }
 
   } catch (error) {
     console.error('❌ Token验证处理失败:', error);

@@ -1,0 +1,38 @@
+<!--pages/login/login.wxml-->
+<view class="login-container">
+  <view class="login-card">
+    <!-- Logo -->
+    <view class="logo">
+      🏥
+    </view>
+    
+    <!-- 应用名称 -->
+    <view class="app-name">医疗服务平台</view>
+    
+    <!-- 应用描述 -->
+    <view class="app-desc">
+      智能医疗服务，专业健康管理
+      为您提供便捷的医疗咨询服务
+    </view>
+    
+    <!-- 微信授权登录按钮 -->
+    <button 
+      class="login-btn {{isLoading ? 'loading' : ''}}"
+      bindtap="onLogin"
+      disabled="{{isLoading}}"
+    >
+      <!-- <view class="wechat-icon"></view> -->
+      <text wx:if="{{!isLoading}}">微信授权登录</text>
+      <text wx:else class="loading-text">登录中...</text>
+    </button>
+    <button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">手机号授权登录</button>
+
+    <!-- 隐私协议 -->
+    <view class="privacy-notice">
+      点击登录即表示同意
+      <text class="privacy-link" bindtap="onPrivacyTap">《隐私协议》</text>
+      和
+      <text class="privacy-link" bindtap="onTermsTap">《服务条款》</text>
+    </view>
+  </view>
+</view>

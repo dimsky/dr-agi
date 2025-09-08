@@ -1,0 +1,389 @@
+/* profile.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding-bottom: 120rpx;
+}
+
+/* 登录提示区域 */
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  padding: 40rpx;
+  background-color: #ffffff;
+  margin: 20rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.login-icon {
+  width: 160rpx;
+  height: 160rpx;
+  margin-bottom: 40rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.login-icon image {
+  width: 100%;
+  height: 100%;
+}
+
+.login-text {
+  text-align: center;
+  margin-bottom: 60rpx;
+}
+
+.login-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.login-desc {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+}
+
+.login-btn {
+  background: linear-gradient(135deg, #1976D2 0%, #1565C0 100%);
+  color: white;
+  border: none;
+  border-radius: 50rpx;
+  width: 300rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+.login-btn:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* 用户头部信息 */
+.user-header {
+  display: flex;
+  align-items: center;
+  padding: 40rpx 30rpx;
+  background-color: #ffffff;
+  margin: 20rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.avatar-section {
+  margin-right: 30rpx;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  border: 3rpx solid #e0e0e0;
+}
+
+.avatar-edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.avatar-edit-text {
+  color: white;
+  font-size: 22rpx;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.user-basic-info {
+  flex: 1;
+}
+
+.nickname-section {
+  margin-bottom: 12rpx;
+}
+
+.nickname {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.nickname-input {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  background-color: #fff;
+}
+
+.openid-section {
+  display: flex;
+  align-items: center;
+}
+
+.openid-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.openid {
+  font-size: 26rpx;
+  color: #999;
+  font-family: monospace;
+}
+
+/* 编辑按钮区域 */
+.edit-section {
+  position: absolute;
+  top: 20rpx;
+  right: 20rpx;
+}
+
+.edit-btn {
+  background-color: #1976D2;
+  color: white;
+  border: none;
+  border-radius: 40rpx;
+  padding: 12rpx 24rpx;
+  font-size: 26rpx;
+  line-height: 1;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12rpx;
+}
+
+.save-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 40rpx;
+  padding: 12rpx 20rpx;
+  font-size: 26rpx;
+  line-height: 1;
+}
+
+.cancel-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 40rpx;
+  padding: 12rpx 20rpx;
+  font-size: 26rpx;
+  line-height: 1;
+}
+
+/* 详细信息区域 */
+.user-details {
+  background-color: #ffffff;
+  margin: 20rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.section-title {
+  padding: 30rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f8f8f8;
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.form-label {
+  width: 180rpx;
+  font-size: 30rpx;
+  color: #333;
+  margin-right: 20rpx;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 30rpx;
+  color: #333;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  background-color: #fff;
+}
+
+.form-value {
+  flex: 1;
+  font-size: 30rpx;
+  color: #666;
+}
+
+.form-picker {
+  flex: 1;
+}
+
+.picker-text {
+  font-size: 30rpx;
+  color: #333;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 12rpx 16rpx;
+  background-color: #fff;
+  position: relative;
+}
+
+.picker-text::after {
+  content: '▼';
+  position: absolute;
+  right: 16rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 功能菜单区域 */
+.menu-section {
+  background-color: #ffffff;
+  margin: 20rpx;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f8f8f8;
+  transition: background-color 0.2s;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background-color: #f8f8f8;
+}
+
+.menu-icon {
+  width: 50rpx;
+  text-align: center;
+  font-size: 36rpx;
+  margin-right: 24rpx;
+}
+
+.menu-text {
+  flex: 1;
+  font-size: 32rpx;
+  color: #333;
+}
+
+.menu-arrow {
+  font-size: 40rpx;
+  color: #ccc;
+  font-weight: 300;
+}
+
+/* 退出登录区域 */
+.logout-section {
+  padding: 40rpx 30rpx;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background-color: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+
+.logout-btn:active {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+/* 加载状态 */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loading-content {
+  background-color: white;
+  padding: 60rpx 40rpx;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.2);
+}
+
+.loading-spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 4rpx solid #f3f3f3;
+  border-top: 4rpx solid #1976D2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}

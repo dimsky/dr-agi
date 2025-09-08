@@ -1,0 +1,175 @@
+<!--feedback.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <view class="header-title">意见反馈</view>
+    <view class="header-desc">您的建议是我们改进的动力</view>
+  </view>
+
+  <!-- 未登录提示 -->
+  <block wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt">
+      <view class="prompt-icon">📝</view>
+      <view class="prompt-text">
+        <text class="prompt-title">需要登录后才能提交反馈</text>
+        <text class="prompt-desc">登录后我们可以更好地处理您的反馈</text>
+      </view>
+      <button class="login-btn" bindtap="checkLoginStatus">去登录</button>
+    </view>
+  </block>
+
+  <!-- 反馈表单 -->
+  <block wx:if="{{isLoggedIn}}">
+    <view class="feedback-form">
+      <!-- 分类选择 -->
+      <view class="form-section">
+        <view class="section-title">
+          <text class="title-text">反馈分类</text>
+          <text class="required">*</text>
+        </view>
+        <picker 
+          class="category-picker"
+          mode="selector"
+          range="{{categoryOptions}}"
+          range-key="name"
+          value="{{selectedCategoryIndex}}"
+          bindchange="onCategoryChange">
+          <view class="picker-content {{selectedCategoryIndex === -1 ? 'placeholder' : ''}}">
+            <text>{{selectedCategoryIndex === -1 ? '请选择反馈分类' : categoryOptions[selectedCategoryIndex].name}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+        <view wx:if="{{selectedCategoryIndex !== -1}}" class="category-desc">
+          {{categoryOptions[selectedCategoryIndex].desc}}
+        </view>
+      </view>
+
+      <!-- 反馈标题 -->
+      <view class="form-section">
+        <view class="section-title">
+          <text class="title-text">反馈标题</text>
+          <text class="required">*</text>
+        </view>
+        <input
+          class="title-input"
+          placeholder="请简要描述您的问题或建议"
+          value="{{formData.title}}"
+          bindinput="onTitleInput"
+          maxlength="100">
+        </input>
+        <view class="input-counter">{{formData.title.length}}/100</view>
+      </view>
+
+      <!-- 反馈内容 -->
+      <view class="form-section">
+        <view class="section-title">
+          <text class="title-text">详细描述</text>
+          <text class="required">*</text>
+        </view>
+        <textarea
+          class="content-textarea"
+          placeholder="请详细描述您遇到的问题或建议，包括具体的使用场景、期望的结果等信息"
+          value="{{formData.content}}"
+          bindinput="onContentInput"
+          maxlength="2000"
+          auto-height="{{true}}"
+          show-confirm-bar="{{false}}">
+        </textarea>
+        <view class="input-counter">{{formData.content.length}}/2000</view>
+      </view>
+
+      <!-- 附件上传 -->
+      <view class="form-section">
+        <view class="section-title">
+          <text class="title-text">上传附件</text>
+          <text class="optional">(可选)</text>
+        </view>
+        <view class="attachment-desc">支持上传图片，最多{{maxFileCount}}张，每张不超过10MB</view>
+        
+        <!-- 已选择的附件 -->
+        <view wx:if="{{formData.attachments.length > 0}}" class="attachment-list">
+          <view 
+            wx:for="{{formData.attachments}}" 
+            wx:key="index" 
+            class="attachment-item">
+            <image 
+              class="attachment-preview" 
+              src="{{item.tempFilePath}}" 
+              mode="aspectFill"
+              bindtap="onPreviewAttachment"
+              data-index="{{index}}">
+            </image>
+            <view 
+              class="attachment-delete" 
+              bindtap="onDeleteAttachment"
+              data-index="{{index}}">
+              ×
+            </view>
+          </view>
+        </view>
+
+        <!-- 选择附件按钮 -->
+        <view 
+          wx:if="{{formData.attachments.length < maxFileCount}}"
+          class="choose-attachment-btn" 
+          bindtap="onChooseAttachment">
+          <view class="btn-icon">📷</view>
+          <view class="btn-text">添加图片</view>
+        </view>
+      </view>
+
+      <!-- 操作按钮 -->
+      <view class="form-actions">
+        <button 
+          class="reset-btn" 
+          bindtap="onResetForm"
+          disabled="{{isSubmitting}}">
+          重置
+        </button>
+        <button 
+          class="submit-btn" 
+          bindtap="onSubmitFeedback"
+          disabled="{{isSubmitting}}"
+          loading="{{isSubmitting}}">
+          {{isSubmitting ? '提交中...' : '提交反馈'}}
+        </button>
+      </view>
+
+      <!-- 温馨提示 -->
+      <view class="tips-section">
+        <view class="tips-title">📋 温馨提示</view>
+        <view class="tips-list">
+          <view class="tip-item">• 我们会在24-48小时内处理您的反馈</view>
+          <view class="tip-item">• 提交后将生成反馈编号，可用于跟踪处理进度</view>
+          <view class="tip-item">• 详细的问题描述有助于我们快速定位和解决问题</view>
+          <view class="tip-item">• 您也可以到个人中心查看历史反馈记录</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 成功提示弹窗 -->
+  <view wx:if="{{showSuccess}}" class="success-modal">
+    <view class="modal-mask" bindtap="onCloseSuccess"></view>
+    <view class="modal-content">
+      <view class="success-icon">✅</view>
+      <view class="success-title">反馈提交成功</view>
+      <view class="success-desc">
+        感谢您的反馈！我们已收到您的建议，将尽快处理。
+      </view>
+      
+      <view class="feedback-number-section">
+        <view class="number-label">反馈编号</view>
+        <view class="number-value" bindtap="onCopyFeedbackNumber">
+          {{feedbackNumber}}
+          <text class="copy-hint">(点击复制)</text>
+        </view>
+      </view>
+      
+      <view class="modal-actions">
+        <button class="view-history-btn" bindtap="onViewMyFeedback">查看记录</button>
+        <button class="close-btn" bindtap="onCloseSuccess">知道了</button>
+      </view>
+    </view>
+  </view>
+</view>

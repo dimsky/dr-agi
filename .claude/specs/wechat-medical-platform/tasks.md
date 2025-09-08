@@ -501,7 +501,7 @@
 
 ### 阶段10: 微信支付集成
 
-- [ ] 45. 创建微信支付服务类
+- [x] 45. 创建微信支付服务类
   - 文件: admin-web/src/services/wechat-pay.ts
   - 实现统一下单API调用
   - 实现支付结果通知处理
@@ -510,7 +510,7 @@
   - 目标: 封装微信支付API调用
   - _需求: 3.2, 3.3_
 
-- [ ] 46. 创建支付相关API路由
+- [x] 46. 创建支付相关API路由
   - 文件: admin-web/src/app/api/payment/create/route.ts
   - 实现POST方法创建支付订单
   - 调用微信支付统一下单
@@ -520,7 +520,7 @@
   - _需求: 3.2_
   - _复用: admin-web/src/services/wechat-pay.ts_
 
-- [ ] 47. 创建支付回调API路由
+- [x] 47. 创建支付回调API路由
   - 文件: admin-web/src/app/api/payment/notify/route.ts
   - 实现POST方法处理微信支付通知
   - 验证通知签名和数据
@@ -532,7 +532,7 @@
 
 ### 阶段11: 小程序功能完善
 
-- [ ] 48. 创建个人信息管理页面
+- [x] 48. 创建个人信息管理页面
   - 文件: miniprogram/pages/profile/profile.js, miniprogram/pages/profile/profile.wxml
   - 显示用户微信信息和业务信息
   - 支持职业、邮箱等信息编辑
@@ -541,7 +541,7 @@
   - 目标: 提供个人信息管理功能
   - _需求: 7.1, 7.2, 7.3_
 
-- [ ] 49. 创建反馈建议页面
+- [x] 49. 创建反馈建议页面
   - 文件: miniprogram/pages/feedback/feedback.js, miniprogram/pages/feedback.wxml
   - 提供反馈内容输入表单
   - 支持分类选择和附件上传
@@ -550,7 +550,7 @@
   - 目标: 收集用户反馈建议
   - _需求: 8.1, 8.2, 8.3_
 
-- [ ] 50. 创建订单历史页面
+- [x] 50. 创建订单历史页面
   - 文件: miniprogram/pages/orders/orders.js, miniprogram/pages/orders/orders.wxml
   - 显示用户历史订单列表
   - 支持订单状态筛选
@@ -559,7 +559,7 @@
   - 目标: 展示用户订单历史
   - _需求: 3.1, 4.4_
 
-- [ ] 51. 创建知情同意书组件
+- [x] 51. 创建知情同意书组件
   - 文件: miniprogram/components/consent-form/consent-form.js
   - 显示知情同意书内容
   - 记录用户同意时间和IP
@@ -570,7 +570,7 @@
 
 ### 阶段12: 错误处理和安全
 
-- [ ] 52. 创建全局错误处理中间件
+- [x] 52. 创建全局错误处理中间件
   - 文件: admin-web/src/lib/error-handler.ts
   - 统一API错误格式和状态码
   - 记录错误日志到文件或服务
@@ -579,11 +579,10 @@
   - 目标: 提供统一错误处理机制
   - _需求: 全部_
 
-- [ ] 53. 实现文件上传安全验证
+- [x] 53. 实现文件上传安全验证
   - 文件: admin-web/src/app/api/upload/route.ts
   - 验证文件类型和大小限制
-  - 集成病毒扫描服务
-  - 生成安全的文件存储路径
+  - 基于aws s3 sdk 标准协议来实现
   - 返回文件访问URL
   - 目标: 提供安全的文件上传功能
   - _需求: 2.2, 安全要求_

@@ -29,6 +29,13 @@
       "when": 1756890301409,
       "tag": "0003_mute_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1757302845821,
+      "tag": "0004_new_bloodstorm",
+      "breakpoints": true
     }
   ]
 }

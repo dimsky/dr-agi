@@ -1,0 +1,214 @@
+<!--profile.wxml-->
+<view class="container">
+  <!-- 登录状态 -->
+  <block wx:if="{{!isLoggedIn}}">
+    <view class="login-prompt">
+      <view class="login-icon">
+        <image src="/images/profile-placeholder.png" mode="aspectFit"></image>
+      </view>
+      <view class="login-text">
+        <text class="login-title">登录后查看个人信息</text>
+        <text class="login-desc">享受更好的医疗AI服务体验</text>
+      </view>
+      <button class="login-btn" bindtap="onLogin">立即登录</button>
+    </view>
+  </block>
+
+  <!-- 用户信息区域 -->
+  <block wx:if="{{isLoggedIn}}">
+    <!-- 用户头像和基本信息 -->
+    <view class="user-header">
+      <view class="avatar-section">
+        <view class="avatar-wrapper" bindtap="onChooseAvatar" wx:if="{{isEditing}}">
+          <image 
+            class="avatar" 
+            src="{{formData.avatarUrl || '/images/default-avatar.png'}}" 
+            mode="aspectFill">
+          </image>
+          <view class="avatar-edit-overlay">
+            <text class="avatar-edit-text">更换头像</text>
+          </view>
+        </view>
+        <image 
+          wx:else
+          class="avatar" 
+          src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" 
+          mode="aspectFill">
+        </image>
+      </view>
+      
+      <view class="user-basic-info">
+        <view class="nickname-section">
+          <input 
+            wx:if="{{isEditing}}"
+            class="nickname-input"
+            placeholder="请输入昵称"
+            value="{{formData.nickname}}"
+            data-field="nickname"
+            bindinput="onInputChange"
+            maxlength="20">
+          </input>
+          <text wx:else class="nickname">{{userInfo.nickname || '未设置昵称'}}</text>
+        </view>
+        
+        <view class="openid-section">
+          <text class="openid-label">用户ID：</text>
+          <text class="openid">{{userInfo.openId ? userInfo.openId.slice(-8) : ''}}</text>
+        </view>
+      </view>
+
+      <!-- 编辑按钮 -->
+      <view class="edit-section">
+        <button 
+          wx:if="{{!isEditing}}" 
+          class="edit-btn" 
+          bindtap="onToggleEdit">
+          编辑
+        </button>
+        <view wx:else class="edit-actions">
+          <button class="save-btn" bindtap="onToggleEdit">保存</button>
+          <button class="cancel-btn" bindtap="onCancelEdit">取消</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 详细信息表单 -->
+    <view class="user-details">
+      <view class="section-title">个人信息</view>
+      
+      <!-- 邮箱 -->
+      <view class="form-item">
+        <view class="form-label">邮箱地址</view>
+        <input 
+          wx:if="{{isEditing}}"
+          class="form-input"
+          placeholder="请输入邮箱地址"
+          value="{{formData.email}}"
+          data-field="email"
+          bindinput="onInputChange"
+          type="email">
+        </input>
+        <text wx:else class="form-value">{{userInfo.email || '未设置'}}</text>
+      </view>
+
+      <!-- 手机号 -->
+      <view class="form-item">
+        <view class="form-label">手机号码</view>
+        <input 
+          wx:if="{{isEditing}}"
+          class="form-input"
+          placeholder="请输入手机号码"
+          value="{{formData.phone}}"
+          data-field="phone"
+          bindinput="onInputChange"
+          type="number">
+        </input>
+        <text wx:else class="form-value">{{userInfo.phone || '未设置'}}</text>
+      </view>
+
+      <!-- 职业 -->
+      <view class="form-item">
+        <view class="form-label">职业</view>
+        <picker 
+          wx:if="{{isEditing}}"
+          class="form-picker"
+          mode="selector"
+          range="{{professionOptions}}"
+          value="{{formData.profession}}"
+          bindchange="onProfessionChange">
+          <view class="picker-text">
+            {{formData.profession || '请选择职业'}}
+          </view>
+        </picker>
+        <text wx:else class="form-value">{{userInfo.profession || '未设置'}}</text>
+      </view>
+
+      <!-- 工作单位 -->
+      <view class="form-item">
+        <view class="form-label">工作单位</view>
+        <input 
+          wx:if="{{isEditing}}"
+          class="form-input"
+          placeholder="请输入工作单位"
+          value="{{formData.institution}}"
+          data-field="institution"
+          bindinput="onInputChange">
+        </input>
+        <text wx:else class="form-value">{{userInfo.institution || '未设置'}}</text>
+      </view>
+
+      <!-- 科室 -->
+      <view class="form-item">
+        <view class="form-label">所在科室</view>
+        <input 
+          wx:if="{{isEditing}}"
+          class="form-input"
+          placeholder="请输入所在科室"
+          value="{{formData.department}}"
+          data-field="department"
+          bindinput="onInputChange">
+        </input>
+        <text wx:else class="form-value">{{userInfo.department || '未设置'}}</text>
+      </view>
+
+      <!-- 职位 -->
+      <view class="form-item">
+        <view class="form-label">职位</view>
+        <picker 
+          wx:if="{{isEditing}}"
+          class="form-picker"
+          mode="selector"
+          range="{{positionOptions}}"
+          value="{{formData.position}}"
+          bindchange="onPositionChange">
+          <view class="picker-text">
+            {{formData.position || '请选择职位'}}
+          </view>
+        </picker>
+        <text wx:else class="form-value">{{userInfo.position || '未设置'}}</text>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <view class="section-title">功能菜单</view>
+      
+      <view class="menu-item" bindtap="onViewOrders">
+        <view class="menu-icon">📋</view>
+        <view class="menu-text">我的订单</view>
+        <view class="menu-arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="onViewFeedback">
+        <view class="menu-icon">💬</view>
+        <view class="menu-text">意见反馈</view>
+        <view class="menu-arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="onContactService">
+        <view class="menu-icon">🎧</view>
+        <view class="menu-text">联系客服</view>
+        <view class="menu-arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="onAbout">
+        <view class="menu-icon">ℹ️</view>
+        <view class="menu-text">关于我们</view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+
+    <!-- 退出登录 -->
+    <view class="logout-section">
+      <button class="logout-btn" bindtap="onLogout">退出登录</button>
+    </view>
+  </block>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-overlay">
+    <view class="loading-content">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+</view>

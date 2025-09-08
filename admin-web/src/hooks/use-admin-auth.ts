@@ -32,7 +32,7 @@ export function useAdminAuth() {
       console.log(`[Auth Hook] useEffect - 设置 isClient = true`);
     }
     setIsClient(true);
-  }, []);
+  }, [isBuildTime]);
 
   // 额外检查：如果 window 对象存在，说明在客户端
   const actuallyIsClient = isClient || (typeof window !== 'undefined');

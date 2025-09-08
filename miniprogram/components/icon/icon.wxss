@@ -1,0 +1,8 @@
+.icon-container {
+  display: inline-block;
+  line-height: 1;
+}
+
+.icon-container .iconfont {
+  display: block;
+}

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { EditServiceButton } from '@/components/client/edit-service-button';
 import { AddServiceButton } from '@/components/client/add-service-button';
+import { useAuthenticatedFetch } from '@/hooks/use-auth';
 import { 
   CheckCircle, 
   XCircle, 
@@ -158,53 +159,6 @@ interface ServicesApiResponse {
   filters?: {
     isActive?: boolean;
   };
-}
-
-// 获取服务列表的API函数
-async function fetchServices(): Promise<ServicesApiResponse> {
-  const response = await fetch('/api/services', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `HTTP ${response.status}: 获取服务列表失败`);
-  }
-
-  const result: ApiResponse<ServicesApiResponse> = await response.json();
-  
-  if (!result.success) {
-    throw new Error(result.message || '获取服务列表失败');
-  }
-
-  return result.data!;
-}
-
-// 删除服务的API函数
-async function deleteService(id: string): Promise<void> {
-  const response = await fetch('/api/services', {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({ id }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `HTTP ${response.status}: 删除服务失败`);
-  }
-
-  const result: ApiResponse<{ id: string; displayName: string; deletedAt: string }> = await response.json();
-  
-  if (!result.success) {
-    throw new Error(result.message || '删除服务失败');
-  }
 }
 
 // 服务配置卡片组件
@@ -476,6 +430,52 @@ function ServiceListSkeleton() {
 // 主服务列表组件
 export function ServiceList() {
   const queryClient = useQueryClient();
+  const authenticatedFetch = useAuthenticatedFetch();
+
+  // 获取服务列表的API函数
+  const fetchServices = async (): Promise<ServicesApiResponse> => {
+    const response = await authenticatedFetch('/api/services', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP ${response.status}: 获取服务列表失败`);
+    }
+
+    const result: ApiResponse<ServicesApiResponse> = await response.json();
+  
+    if (!result.success) {
+      throw new Error(result.message || '获取服务列表失败');
+    }
+
+    return result.data!;
+  };
+
+  // 删除服务的API函数
+  const deleteService = async (id: string): Promise<void> => {
+    const response = await authenticatedFetch('/api/services', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ id }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || `HTTP ${response.status}: 删除服务失败`);
+    }
+
+    const result: ApiResponse<{ id: string; displayName: string; deletedAt: string }> = await response.json();
+  
+    if (!result.success) {
+      throw new Error(result.message || '删除服务失败');
+    }
+  };
   
   // 获取服务列表
   const { data, isLoading, error } = useQuery({

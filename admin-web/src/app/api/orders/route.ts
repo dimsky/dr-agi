@@ -1,20 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth-middleware';
+import { AuthenticatedUser, USER_ROLES } from '@/types/auth';
 import { medicalServiceProcessor } from '@/services/medical';
 import { db } from '@/db';
 import { orders } from '@/db/schema/orders';
 import { aiService } from '@/db/schema/ai_service';
 import { users } from '@/db/schema/users';
-import { eq, gte, lte, desc, count } from 'drizzle-orm';
+import { eq, gte, lte, desc, count, and } from 'drizzle-orm';
 import { withSoftDeleteFilter } from '@/lib/soft-delete';
 
 /**
  * GET /api/orders - 获取订单列表
  * 
+ * 权限控制：
+ * - 管理员可以查看所有订单
+ * - 普通用户只能查看自己的订单
+ * 
  * 查询参数：
  * - page: number (可选，默认1) - 页码
  * - limit: number (可选，默认10) - 每页数量
  * - status: string (可选) - 订单状态过滤
- * - userId: string (可选) - 用户ID过滤
+ * - userId: string (可选) - 用户ID过滤 (仅管理员可用)
  * - aiServiceId: string (可选) - 服务ID过滤
  * - dateFrom: string (可选) - 开始日期过滤 (ISO格式)
  * - dateTo: string (可选) - 结束日期过滤 (ISO格式)
@@ -33,7 +39,7 @@ import { withSoftDeleteFilter } from '@/lib/soft-delete';
  *   }
  * }
  */
-export async function GET(request: NextRequest) {
+async function getOrders(request: NextRequest, user: AuthenticatedUser) {
   try {
     const { searchParams } = new URL(request.url);
     
@@ -43,13 +49,23 @@ export async function GET(request: NextRequest) {
     const offset = (page - 1) * limit;
     
     const status = searchParams.get('status');
-    const userId = searchParams.get('userId');
+    let userId = searchParams.get('userId'); // 管理员可以指定用户ID
     const aiServiceId = searchParams.get('aiServiceId');
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     
+    // 权限控制：普通用户只能查看自己的订单
+    if (user.role !== USER_ROLES.ADMIN) {
+      userId = user.id; // 强制设置为当前用户ID
+    }
+    
     // 构建查询条件
     const conditions = [];
+    
+    // 如果指定了userId（管理员查询特定用户或普通用户查询自己）
+    if (userId) {
+      conditions.push(eq(orders.userId, userId));
+    }
     
     if (status) {
       // 验证状态值是否有效
@@ -57,10 +73,6 @@ export async function GET(request: NextRequest) {
       if (validStatuses.includes(status)) {
         conditions.push(eq(orders.status, status as typeof orders.status.enumValues[number]));
       }
-    }
-    
-    if (userId) {
-      conditions.push(eq(orders.userId, userId));
     }
     
     if (aiServiceId) {
@@ -188,6 +200,8 @@ export async function GET(request: NextRequest) {
 /**
  * POST /api/orders - 创建AI服务订单
  * 
+ * 权限控制：所有认证用户都可以创建订单
+ * 
  * 业务流程：
  * 1. 根据serviceId获取AI服务配置
  * 2. 验证服务状态和输入数据
@@ -200,18 +214,8 @@ export async function GET(request: NextRequest) {
  *   "serviceData": { ... }    // 服务输入数据
  * }
  */
-export async function POST(request: NextRequest) {
+async function createOrder(request: NextRequest, user: AuthenticatedUser) {
   try {
-    // 用户ID从中间件传递过来
-    const userId = request.headers.get('x-user-id');
-    if (!userId) {
-      return NextResponse.json({
-        success: false,
-        message: '用户认证失败',
-        error: 'MISSING_USER_ID'
-      }, { status: 401 });
-    }
-
     // 解析请求参数
     const body = await request.json();
     const { serviceId, serviceData } = body;
@@ -278,7 +282,7 @@ export async function POST(request: NextRequest) {
 
     // 创建订单记录（待支付状态）
     const [order] = await db.insert(orders).values({
-      userId,
+      userId: user.id, // 使用认证用户的ID
       aiServiceId: serviceId,
       serviceData,
       status: 'pending', // 待支付
@@ -313,3 +317,7 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+// 导出带权限验证的处理函数
+export const GET = withAuth()(getOrders);
+export const POST = withAuth()(createOrder);

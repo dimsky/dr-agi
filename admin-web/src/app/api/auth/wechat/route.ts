@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getWeChatAuthService } from '@/services/wechat-auth';
-import { WeChatUserInfo } from '@/types/auth';
 
 // 请求体接口
 interface WeChatLoginRequest {
   code: string;
-  userInfo: WeChatUserInfo;
 }
 
 // 响应接口
@@ -41,28 +39,11 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
       );
     }
 
-    if (!body.userInfo) {
-      return NextResponse.json(
-        { success: false, error: '缺少用户信息' },
-        { status: 400 }
-      );
-    }
-
     // 使用 WeChatAuthService 处理登录
     const authService = getWeChatAuthService();
     
-    // 转换微信用户信息格式
-    const userInput = {
-      nickname: body.userInfo.nickName,
-      avatarUrl: body.userInfo.avatarUrl,
-      gender: body.userInfo.gender.toString(),
-      city: body.userInfo.city,
-      province: body.userInfo.province,
-      country: body.userInfo.country,
-      language: body.userInfo.language,
-    };
-    
-    const result = await authService.login(body.code, userInput);
+    // 直接使用授权码登录，不传递用户信息
+    const result = await authService.login(body.code);
 
     console.log('✅ 微信登录成功:', { userId: result.user.id, nickname: result.user.nickname });
 
@@ -75,6 +56,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
         nickname: result.user.nickname || '',
         avatarUrl: result.user.avatarUrl || '',
         openId: result.user.openId,
+        role: result.user.role, // 添加用户角色信息
       },
     });
 

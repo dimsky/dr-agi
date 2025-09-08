@@ -1,0 +1,128 @@
+<view class="consent-form-container">
+  <!-- 知情同意书标题 -->
+  <view class="consent-header">
+    <text class="consent-title">知情同意书</text>
+    <text class="consent-version">版本：{{consentVersion}}</text>
+  </view>
+
+  <!-- 知情同意书内容区域 -->
+  <scroll-view 
+    class="consent-content" 
+    scroll-y="true"
+    bindscrolltolower="handleScrollToBottom"
+  >
+    <view class="consent-text">
+      <!-- 服务说明 -->
+      <view class="section">
+        <text class="section-title">1. 服务说明</text>
+        <text class="section-content">
+          您即将使用我们的AI医疗辅助服务平台。本平台通过人工智能技术为您提供健康信息分析、初步医疗建议等服务。请注意，本服务仅供参考，不能替代专业医生的诊断和治疗。
+        </text>
+      </view>
+
+      <!-- 数据收集与使用 -->
+      <view class="section">
+        <text class="section-title">2. 数据收集与使用</text>
+        <text class="section-content">
+          为了提供更好的服务，我们会收集您的：
+          \n• 基本信息（姓名、年龄、性别）
+          \n• 健康相关信息（症状描述、既往病史）
+          \n• 微信授权信息（头像、昵称）
+          \n• 设备信息和使用记录
+          \n我们承诺严格保护您的隐私，仅将数据用于服务提供，不会泄露给第三方。
+        </text>
+      </view>
+
+      <!-- 免责声明 -->
+      <view class="section">
+        <text class="section-title">3. 免责声明</text>
+        <text class="section-content">
+          本平台提供的AI医疗建议仅供参考，不构成医疗诊断：
+          \n• 如遇紧急情况，请立即就医
+          \n• 请勿完全依赖AI建议进行自我诊断
+          \n• 任何医疗决定应咨询专业医生
+          \n• 平台不承担因使用服务产生的任何后果责任
+        </text>
+      </view>
+
+      <!-- 用户权利 -->
+      <view class="section">
+        <text class="section-title">4. 您的权利</text>
+        <text class="section-content">
+          您有权：
+          \n• 随时撤回数据使用同意
+          \n• 要求查看、更正或删除个人数据
+          \n• 了解数据处理情况
+          \n• 停止使用服务并注销账户
+        </text>
+      </view>
+
+      <!-- 联系方式 -->
+      <view class="section">
+        <text class="section-title">5. 联系我们</text>
+        <text class="section-content">
+          如有疑问，请通过以下方式联系我们：
+          \n• 客服邮箱：support@medical-ai.com
+          \n• 客服电话：400-123-4567
+          \n• 工作时间：周一至周五 9:00-18:00
+        </text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 同意区域 -->
+  <view class="consent-actions">
+    <!-- 必读提示 -->
+    <view class="read-notice {{!hasScrolledToBottom ? 'active' : ''}}" wx:if="{{!hasScrolledToBottom}}">
+      <text>请仔细阅读完整内容后再进行同意</text>
+    </view>
+
+    <!-- 同意选项 -->
+    <view class="consent-checkboxes">
+      <checkbox-group bindchange="handleConsentChange">
+        <label class="checkbox-item">
+          <checkbox 
+            value="terms" 
+            checked="{{agreedToTerms}}" 
+            disabled="{{!hasScrolledToBottom}}"
+          />
+          <text class="checkbox-text">我已仔细阅读并同意以上条款</text>
+        </label>
+        
+        <label class="checkbox-item">
+          <checkbox 
+            value="privacy" 
+            checked="{{agreedToPrivacy}}" 
+            disabled="{{!hasScrolledToBottom}}"
+          />
+          <text class="checkbox-text">我同意平台收集和使用我的个人信息</text>
+        </label>
+      </checkbox-group>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="consent-buttons">
+      <button 
+        class="cancel-btn" 
+        bindtap="handleCancel"
+        disabled="{{isSubmitting}}"
+      >
+        取消
+      </button>
+      
+      <button 
+        class="confirm-btn {{canConfirm ? 'enabled' : 'disabled'}}"
+        bindtap="handleConfirm"
+        disabled="{{!canConfirm || isSubmitting}}"
+        loading="{{isSubmitting}}"
+      >
+        {{isSubmitting ? '提交中...' : '确认同意'}}
+      </button>
+    </view>
+
+    <!-- 法律声明 -->
+    <view class="legal-notice">
+      <text>点击"确认同意"表示您已年满18周岁，具有完全民事行为能力，并自愿接受本协议所有条款。</text>
+    </view>
+  </view>
+</view>

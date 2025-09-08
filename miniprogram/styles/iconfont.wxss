@@ -1,0 +1,42 @@
+/* iconfont 字体文件导入 - 使用阿里巴巴矢量图标库 */
+@font-face {
+  font-family: 'iconfont';
+  src: url('data:application/x-font-woff2;charset=utf-8;base64,d09GMgABAAAAAN4AABAAAAAN8AAAgAoAANYQAAEAAAAAAAAAAAAAAAAAAAAAAAAAP0ZGVE0cGh4GYACEShEICtsyxwUZAAJSDQgKrGKkNAE2AiQDhC4LhEAABCAFhGkHIDIhRAZiG5M/K/aBfE5lMzB8i2DV3YQhRCVGjh7O/+3fPt/7ZjaWBRgFAKgJqg0gAKD//2fvPg8fYB8m3GQQrCYRQbYAaCoQ6LxBRy8sRPHhCIxd5c') format('woff2');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 48rpx;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 图标定义 */
+.icon-home:before { content: "\e6d8"; }
+.icon-home-active:before { content: "\e6d9"; }
+.icon-services:before { content: "\e6da"; }
+.icon-services-active:before { content: "\e6db"; }
+.icon-orders:before { content: "\e6dc"; }
+.icon-orders-active:before { content: "\e6dd"; }
+.icon-profile:before { content: "\e6de"; }
+.icon-profile-active:before { content: "\e6df"; }
+
+/* 功能图标 */
+.icon-user:before { content: "\e7ae"; }
+.icon-avatar:before { content: "\e7af"; }
+.icon-share:before { content: "\e7b0"; }
+.icon-wechat:before { content: "\e7b1"; }
+.icon-medical:before { content: "\e7b2"; }
+.icon-task:before { content: "\e7b3"; }
+.icon-feedback:before { content: "\e7b4"; }
+
+/* 通用图标 */
+.icon-arrow-right:before { content: "\e641"; }
+.icon-arrow-left:before { content: "\e640"; }
+.icon-check:before { content: "\e642"; }
+.icon-close:before { content: "\e643"; }
+.icon-loading:before { content: "\e644"; }
+.icon-success:before { content: "\e645"; }
+.icon-error:before { content: "\e646"; }
+.icon-warning:before { content: "\e647"; }

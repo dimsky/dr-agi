@@ -1,0 +1,246 @@
+/* 知情同意书组件样式 */
+.consent-form-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8f9fa;
+}
+
+/* 头部样式 */
+.consent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 40rpx 20rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+}
+
+.consent-title {
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.consent-version {
+  font-size: 24rpx;
+  opacity: 0.8;
+}
+
+/* 内容区域 */
+.consent-content {
+  flex: 1;
+  padding: 0 40rpx;
+  margin: 20rpx 0;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  margin-left: 20rpx;
+  margin-right: 20rpx;
+}
+
+.consent-text {
+  padding: 40rpx 20rpx;
+}
+
+/* 章节样式 */
+.section {
+  margin-bottom: 40rpx;
+}
+
+.section-title {
+  display: block;
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20rpx;
+  line-height: 1.4;
+}
+
+.section-content {
+  display: block;
+  font-size: 28rpx;
+  color: #555555;
+  line-height: 1.8;
+  text-align: justify;
+  white-space: pre-line;
+}
+
+/* 操作区域 */
+.consent-actions {
+  background-color: #ffffff;
+  padding: 30rpx 40rpx;
+  border-top: 1rpx solid #e9ecef;
+}
+
+/* 必读提示 */
+.read-notice {
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  background-color: #fff3cd;
+  border: 1rpx solid #ffeaa7;
+  border-radius: 12rpx;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-10rpx);
+  transition: all 0.3s ease;
+}
+
+.read-notice.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.read-notice text {
+  font-size: 26rpx;
+  color: #856404;
+}
+
+/* 复选框区域 */
+.consent-checkboxes {
+  margin-bottom: 30rpx;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 24rpx;
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  transition: background-color 0.3s ease;
+}
+
+.checkbox-item:last-child {
+  margin-bottom: 0;
+}
+
+.checkbox-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.6;
+  margin-left: 20rpx;
+}
+
+/* 复选框样式调整 */
+checkbox {
+  transform: scale(1.2);
+  margin-right: 10rpx;
+}
+
+/* 按钮区域 */
+.consent-buttons {
+  display: flex;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.cancel-btn, .confirm-btn {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  color: #6c757d;
+  border: 2rpx solid #dee2e6;
+}
+
+.cancel-btn:active {
+  background-color: #e9ecef;
+}
+
+.confirm-btn {
+  background-color: #07c160;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.3);
+}
+
+.confirm-btn.enabled:active {
+  transform: translateY(2rpx);
+  box-shadow: 0 4rpx 12rpx rgba(7, 193, 96, 0.3);
+}
+
+.confirm-btn.disabled {
+  background-color: #ccc;
+  color: #999;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.confirm-btn[disabled] {
+  background-color: #ccc;
+  color: #999;
+  box-shadow: none;
+}
+
+/* 法律声明 */
+.legal-notice {
+  padding: 20rpx;
+  background-color: #f8f9fa;
+  border-radius: 12rpx;
+  text-align: center;
+}
+
+.legal-notice text {
+  font-size: 24rpx;
+  color: #6c757d;
+  line-height: 1.6;
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 750rpx) {
+  .consent-header {
+    padding: 20rpx 30rpx 15rpx;
+  }
+  
+  .consent-title {
+    font-size: 32rpx;
+  }
+  
+  .consent-content {
+    margin: 15rpx 15rpx;
+  }
+  
+  .consent-text {
+    padding: 30rpx 15rpx;
+  }
+  
+  .section-title {
+    font-size: 30rpx;
+  }
+  
+  .section-content {
+    font-size: 26rpx;
+  }
+  
+  .consent-actions {
+    padding: 25rpx 30rpx;
+  }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6rpx;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3rpx;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3rpx;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}

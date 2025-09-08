@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { AuthProvider } from "@/hooks/use-auth";
 import { AdminNavigation } from "@/components/layout/admin-navigation";
 import { AdminFooter } from "@/components/layout/admin-footer";
 import { Toaster } from "@/components/ui/toaster";
@@ -39,12 +40,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <QueryProvider>
-          <AdminNavigation />
-          <main className="flex-1">
-            {children}
-          </main>
-          <AdminFooter />
-          <Toaster />
+          <AuthProvider>
+            <AdminNavigation />
+            <main className="flex-1">
+              {children}
+            </main>
+            <AdminFooter />
+            <Toaster />
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

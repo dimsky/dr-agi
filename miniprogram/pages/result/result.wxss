@@ -566,16 +566,16 @@
 }
 
 /* 动画效果 */
-.result-content > * {
+.result-content .result-item {
   animation: fadeInUp 0.6s ease-out forwards;
   opacity: 0;
   transform: translateY(30rpx);
 }
 
-.result-content > *:nth-child(1) { animation-delay: 0.1s; }
-.result-content > *:nth-child(2) { animation-delay: 0.2s; }
-.result-content > *:nth-child(3) { animation-delay: 0.3s; }
-.result-content > *:nth-child(4) { animation-delay: 0.4s; }
+.result-content .result-item:nth-child(1) { animation-delay: 0.1s; }
+.result-content .result-item:nth-child(2) { animation-delay: 0.2s; }
+.result-content .result-item:nth-child(3) { animation-delay: 0.3s; }
+.result-content .result-item:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes fadeInUp {
   to {

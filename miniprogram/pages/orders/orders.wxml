@@ -1,0 +1,192 @@
+<!--pages/orders/orders.wxml-->
+<view class="container">
+  <!-- 页面标题 -->
+  <view class="page-header">
+    <text class="page-title">我的订单</text>
+    <text class="page-subtitle">管理您的医疗服务订单</text>
+  </view>
+
+  <!-- 订单状态筛选 -->
+  <view class="filter-tabs">
+    <scroll-view scroll-x="true" class="filter-scroll">
+      <view class="filter-list">
+        <view 
+          wx:for="{{filterOptions}}" 
+          wx:key="key" 
+          class="filter-item {{currentFilter === item.key ? 'active' : ''}}" 
+          bindtap="onFilterChange" 
+          data-filter="{{item.key}}"
+        >
+          <text class="filter-text">{{item.label}}</text>
+          <text wx:if="{{item.count > 0}}" class="filter-count">{{item.count}}</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-container">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">加载订单中...</text>
+  </view>
+
+  <!-- 错误状态 -->
+  <view wx:elif="{{error}}" class="error-container">
+    <view class="error-icon">⚠️</view>
+    <text class="error-text">{{error}}</text>
+    <button class="retry-button" bindtap="onRetry">重试</button>
+  </view>
+
+  <!-- 空状态 -->
+  <view wx:elif="{{filteredOrders.length === 0 && !loading}}" class="empty-container">
+    <view class="empty-icon">📋</view>
+    <text class="empty-text">暂无订单</text>
+    <text class="empty-subtitle">您还没有任何订单，快去选择服务吧</text>
+    <button class="go-service-button" bindtap="goToServices">选择服务</button>
+  </view>
+
+  <!-- 订单列表 -->
+  <view wx:else class="orders-list">
+    <view 
+      wx:for="{{filteredOrders}}" 
+      wx:key="id" 
+      class="order-item"
+    >
+      <!-- 订单头部信息 -->
+      <view class="order-header" bindtap="onViewOrder" data-order-id="{{item.id}}">
+        <view class="order-info">
+          <view class="order-title">{{item.serviceName}}</view>
+          <view class="order-time">下单时间：{{item.createdAt}}</view>
+          <view class="order-id">订单号：{{item.id}}</view>
+        </view>
+        <view class="order-status">
+          <view class="status-badge status-{{item.status}}">{{item.statusText}}</view>
+          <view class="order-amount">￥{{item.amount}}</view>
+        </view>
+      </view>
+
+      <!-- 订单详细信息 -->
+      <view class="order-details">
+        <!-- 服务信息概要 -->
+        <view class="service-summary">
+          <view wx:if="{{item.serviceData.age}}" class="detail-item">
+            <text class="detail-label">年龄：</text>
+            <text class="detail-value">{{item.serviceData.age}}岁</text>
+          </view>
+          <view wx:if="{{item.serviceData.gender}}" class="detail-item">
+            <text class="detail-label">性别：</text>
+            <text class="detail-value">{{item.serviceData.gender}}</text>
+          </view>
+          <view wx:if="{{item.serviceData.condition}}" class="detail-item">
+            <text class="detail-label">情况：</text>
+            <text class="detail-value">{{item.serviceData.condition}}</text>
+          </view>
+          <view wx:if="{{item.serviceData.disease}}" class="detail-item">
+            <text class="detail-label">疾病：</text>
+            <text class="detail-value">{{item.serviceData.disease}}</text>
+          </view>
+          <view wx:if="{{item.serviceData.document}}" class="detail-item">
+            <text class="detail-label">文档：</text>
+            <text class="detail-value">{{item.serviceData.document}}</text>
+          </view>
+        </view>
+
+        <!-- 时间轴 -->
+        <view class="order-timeline">
+          <view class="timeline-item completed">
+            <view class="timeline-dot"></view>
+            <view class="timeline-content">
+              <text class="timeline-title">订单创建</text>
+              <text class="timeline-time">{{item.createdAt}}</text>
+            </view>
+          </view>
+          
+          <view wx:if="{{item.paidAt}}" class="timeline-item completed">
+            <view class="timeline-dot"></view>
+            <view class="timeline-content">
+              <text class="timeline-title">支付完成</text>
+              <text class="timeline-time">{{item.paidAt}}</text>
+            </view>
+          </view>
+          
+          <view wx:if="{{item.status === 'processing'}}" class="timeline-item active">
+            <view class="timeline-dot"></view>
+            <view class="timeline-content">
+              <text class="timeline-title">任务执行中</text>
+              <text class="timeline-time">预计3-5个工作日完成</text>
+            </view>
+          </view>
+          
+          <view wx:if="{{item.completedAt}}" class="timeline-item completed">
+            <view class="timeline-dot"></view>
+            <view class="timeline-content">
+              <text class="timeline-title">任务完成</text>
+              <text class="timeline-time">{{item.completedAt}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 订单操作按钮 -->
+      <view class="order-actions">
+        <!-- 待付款状态按钮 -->
+        <view wx:if="{{item.status === 'pending'}}" class="action-buttons">
+          <button class="action-btn cancel-btn" bindtap="onCancelOrder" data-order="{{item}}">取消订单</button>
+          <button class="action-btn pay-btn" bindtap="onContinuePayment" data-order="{{item}}">继续支付</button>
+        </view>
+
+        <!-- 已付款状态按钮 -->
+        <view wx:elif="{{item.status === 'paid'}}" class="action-buttons">
+          <button class="action-btn detail-btn" bindtap="onViewOrder" data-order-id="{{item.id}}">查看详情</button>
+          <button class="action-btn reorder-btn" bindtap="onReorder" data-order="{{item}}">重新购买</button>
+        </view>
+
+        <!-- 处理中状态按钮 -->
+        <view wx:elif="{{item.status === 'processing'}}" class="action-buttons">
+          <button class="action-btn detail-btn" bindtap="onViewOrder" data-order-id="{{item.id}}">查看详情</button>
+          <button class="action-btn progress-btn" bindtap="onViewProgress" data-order-id="{{item.id}}">查看进度</button>
+        </view>
+
+        <!-- 已完成状态按钮 -->
+        <view wx:elif="{{item.status === 'completed'}}" class="action-buttons">
+          <button class="action-btn detail-btn" bindtap="onViewOrder" data-order-id="{{item.id}}">查看详情</button>
+          <button wx:if="{{item.hasResult}}" class="action-btn result-btn" bindtap="onViewResult" data-order-id="{{item.id}}">查看结果</button>
+          <button class="action-btn reorder-btn" bindtap="onReorder" data-order="{{item}}">重新购买</button>
+        </view>
+
+        <!-- 已取消状态按钮 -->
+        <view wx:elif="{{item.status === 'cancelled'}}" class="action-buttons">
+          <button class="action-btn detail-btn" bindtap="onViewOrder" data-order-id="{{item.id}}">查看详情</button>
+          <button class="action-btn reorder-btn" bindtap="onReorder" data-order="{{item}}">重新购买</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 加载更多指示器 -->
+  <view wx:if="{{isLoadingMore}}" class="load-more-indicator">
+    <view class="loading-spinner small"></view>
+    <text class="loading-text">加载更多...</text>
+  </view>
+
+  <!-- 没有更多数据提示 -->
+  <view wx:if="{{!hasMoreData && filteredOrders.length > 0}}" class="no-more-data">
+    <text>已显示全部订单</text>
+  </view>
+
+  <!-- 底部提示信息 -->
+  <view class="footer-info">
+    <view class="info-item">
+      <text class="info-icon">💡</text>
+      <text class="info-text">点击订单可查看详细信息</text>
+    </view>
+    <view class="info-item">
+      <text class="info-icon">🔄</text>
+      <text class="info-text">支持重新购买相同服务</text>
+    </view>
+    <view class="info-item">
+      <text class="info-icon">📞</text>
+      <text class="info-text">如有疑问，请联系客服</text>
+    </view>
+  </view>
+</view>

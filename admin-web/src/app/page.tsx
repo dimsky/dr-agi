@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 import { db } from '@/db';
 import { AdminAuthGuard } from '@/components/auth/admin-auth-guard';
+import { AuthTestComponent } from '@/components/auth/auth-test';
 import { users } from '@/db/schema/users';
 import { orders } from '@/db/schema/orders';
 import { tasks } from '@/db/schema/tasks';
@@ -422,6 +423,11 @@ async function DashboardContent() {
             <RecentOrdersTable orders={recentOrders} />
           </Suspense>
           <SystemHealthPanel health={systemHealth} />
+        </div>
+
+        {/* 认证测试面板 */}
+        <div className="flex justify-center">
+          <AuthTestComponent />
         </div>
       </div>
     </div>

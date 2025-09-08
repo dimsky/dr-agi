@@ -29,7 +29,7 @@
     </view>
 
     <!-- 结果摘要 -->
-    <view wx:if="{{resultContent.summary}}" class="result-summary">
+    <view wx:if="{{resultContent.summary}}" class="result-summary result-item">
       <view class="summary-header">
         <text class="summary-title">📋 结果摘要</text>
       </view>
@@ -37,7 +37,7 @@
     </view>
 
     <!-- 文本结果 -->
-    <view wx:if="{{resultContent.textContent && resultType !== 'mixed'}}" class="text-result">
+    <view wx:if="{{resultContent.textContent && resultType !== 'mixed'}}" class="text-result result-item">
       <view class="result-section-header">
         <text class="section-title">📄 分析报告</text>
         <button class="copy-btn" bindtap="onCopyText">复制</button>
@@ -48,7 +48,7 @@
     </view>
 
     <!-- 混合结果展示 -->
-    <view wx:if="{{resultType === 'mixed'}}" class="mixed-result">
+    <view wx:if="{{resultType === 'mixed'}}" class="mixed-result result-item">
       <!-- 文本部分 -->
       <view wx:if="{{resultContent.textContent}}" class="result-section">
         <view class="result-section-header">

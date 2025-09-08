@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useIsAdminAuthenticated, useAdminLogout } from '@/hooks/use-admin-auth'
+import { useAuth } from '@/hooks/use-auth'
 import { LogOut, Shield } from 'lucide-react'
 
 interface NavigationItem {
@@ -69,8 +69,7 @@ const navigationItems: NavigationItem[] = [
 export function AdminNavigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isClient, setIsClient] = useState(false)
-  const { isAuthenticated, adminInfo, isLoading } = useIsAdminAuthenticated()
-  const logoutMutation = useAdminLogout()
+  const { user, isAuthenticated, logout } = useAuth()
 
   // 确保只在客户端渲染认证相关的UI
   useEffect(() => {
@@ -78,7 +77,8 @@ export function AdminNavigation() {
   }, [])
 
   const handleLogout = () => {
-    logoutMutation.mutate()
+    logout()
+    window.location.href = '/admin/login' // 退出后跳转到登录页
   }
 
   // 如果在登录页面，不显示管理员信息
@@ -158,20 +158,13 @@ export function AdminNavigation() {
             {/* Admin User Menu */}
             {!isLoginPage && isClient && (
               <div className="hidden sm:block">
-                {isLoading ? (
-                  <div className="h-8 px-3 flex items-center">
-                    <div className="flex items-center space-x-2">
-                      <Shield className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm text-muted-foreground">加载中...</span>
-                    </div>
-                  </div>
-                ) : isAuthenticated && adminInfo ? (
+                {isAuthenticated && user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="sm" className="h-8 px-3">
                         <div className="flex items-center space-x-2">
                           <Shield className="w-4 h-4" />
-                          <span className="text-sm font-medium">{adminInfo.username}</span>
+                          <span className="text-sm font-medium">{user.username}</span>
                         </div>
                       </Button>
                     </DropdownMenuTrigger>
@@ -180,14 +173,14 @@ export function AdminNavigation() {
                         <div className="flex flex-col space-y-1">
                           <p className="text-sm font-medium">管理员账户</p>
                           <p className="text-xs text-muted-foreground">
-                            {adminInfo.username}
+                            {user.username}
                           </p>
                         </div>
                       </DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
+                      <DropdownMenuItem onClick={handleLogout}>
                         <LogOut className="mr-2 h-4 w-4" />
-                        <span>{logoutMutation.isPending ? '退出中...' : '退出登录'}</span>
+                        <span>退出登录</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -246,23 +239,20 @@ export function AdminNavigation() {
                   </div>
                   {isClient && (
                     <>
-                      {isLoading ? (
-                        <span className="text-xs text-muted-foreground">加载中...</span>
-                      ) : isAuthenticated && adminInfo ? (
+                      {isAuthenticated && user ? (
                         <div className="flex items-center space-x-3">
                           <div className="flex items-center space-x-1">
                             <Shield className="w-3 h-3 text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">{adminInfo.username}</span>
+                            <span className="text-sm text-muted-foreground">{user.username}</span>
                           </div>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={handleLogout}
-                            disabled={logoutMutation.isPending}
                             className="h-6 px-2 text-xs"
                           >
                             <LogOut className="w-3 h-3 mr-1" />
-                            {logoutMutation.isPending ? '退出中' : '退出'}
+                            退出
                           </Button>
                         </div>
                       ) : (

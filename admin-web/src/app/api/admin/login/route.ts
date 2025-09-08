@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'root';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '123';
-const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || 'admin-session-secret';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
 interface LoginRequest {
   username: string;
@@ -44,33 +44,26 @@ export async function POST(request: NextRequest) {
       {
         username: ADMIN_USERNAME,
         role: 'admin',
-        type: 'admin-session',
       },
-      ADMIN_SESSION_SECRET,
-      { expiresIn: '24h' }
+      JWT_SECRET,
+      { 
+        expiresIn: '24h',
+        issuer: 'wechat-medical-platform',
+        audience: 'miniprogram'
+      }
     );
 
-    // 创建响应并设置 cookie
-    const response = NextResponse.json({
+    // 返回 token 供客户端使用
+    return NextResponse.json({
       success: true,
       message: '登录成功',
       data: {
         username: ADMIN_USERNAME,
         role: 'admin',
+        token: token, // 直接返回 token
       },
       timestamp: new Date().toISOString(),
     });
-
-    // 设置 httpOnly cookie
-    response.cookies.set('admin-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 24 * 60 * 60, // 24 hours
-      path: '/',
-    });
-
-    return response;
   } catch (error) {
     console.error('管理员登录失败:', error);
     
@@ -88,22 +81,13 @@ export async function POST(request: NextRequest) {
 // 管理员退出登录
 export async function DELETE() {
   try {
-    const response = NextResponse.json({
+    // 由于不再使用 cookie，退出登录只需要返回成功响应
+    // 客户端需要自行清除存储的 token
+    return NextResponse.json({
       success: true,
       message: '退出登录成功',
       timestamp: new Date().toISOString(),
     });
-
-    // 清除 cookie
-    response.cookies.set('admin-token', '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 0,
-      path: '/',
-    });
-
-    return response;
   } catch (error) {
     console.error('管理员退出登录失败:', error);
     

@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Shield, User, Lock } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/use-auth';
 
 interface LoginFormData {
   username: string;
@@ -23,6 +24,7 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +42,13 @@ export default function AdminLoginPage() {
 
       const result = await response.json();
 
-      if (result.success) {
+      if (result.success && result.data?.token) {
+        // 使用认证hook保存token和用户信息
+        login(result.data.token, {
+          username: result.data.username,
+          role: result.data.role,
+        });
+        
         toast.success('登录成功', {
           description: '正在跳转到管理后台...',
         });

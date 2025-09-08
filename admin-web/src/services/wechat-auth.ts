@@ -7,7 +7,8 @@ import {
   JWTPayload, 
   AuthError, 
   WECHAT_ERROR_CODES, 
-  WECHAT_ERROR_MESSAGES 
+  WECHAT_ERROR_MESSAGES,
+  UserRole 
 } from '@/types/auth';
 
 /**
@@ -202,7 +203,8 @@ class WeChatAuthService {
     try {
       const payload: JWTPayload = {
         userId: user.id,
-        type: 'wechat_user',
+        role: user.role as UserRole, // 类型转换
+        openId: user.openId,
         iss: 'wechat-medical-platform',
         aud: 'wechat-miniprogram'
       };
@@ -322,6 +324,8 @@ class WeChatAuthService {
     try {
       // 1. 换取session
       const session = await this.exchangeCodeForSession(code);
+
+      console.log("wechat session", session)
       
       // 2. 创建或更新用户
       const user = await this.createOrUpdateUser(session, userInfo);
@@ -336,7 +340,8 @@ class WeChatAuthService {
           id: user.id,
           nickname: user.nickname || '',
           avatarUrl: user.avatarUrl || '',
-          openId: user.openId
+          openId: user.openId,
+          role: user.role // 添加角色字段
         }
       };
     } catch (error) {

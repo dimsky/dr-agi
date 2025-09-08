@@ -1,0 +1,4 @@
+<!-- 矢量图标组件 -->
+<view class="icon-container">
+  <text class="iconfont icon-{{name}}" style="font-size: {{size}}rpx; color: {{color}};"></text>
+</view>
