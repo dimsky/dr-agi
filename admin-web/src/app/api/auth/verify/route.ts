@@ -109,19 +109,38 @@ export async function POST(request: NextRequest): Promise<NextResponse<TokenVeri
   try {
     console.log('🚀 开始处理Token验证请求...');
 
-    // 解析请求体
-    const body: TokenVerifyRequest = await request.json();
+    // 尝试从多个来源获取token
+    let token: string | null = null;
+    
+    // 1. 首先尝试从Authorization header获取
+    const authorization = request.headers.get('authorization');
+    if (authorization && authorization.startsWith('Bearer ')) {
+      token = authorization.substring(7); // 移除 "Bearer " 前缀
+      console.log('✅ 从Authorization header获取token');
+    } else {
+      // 2. 如果header没有，尝试从请求体获取
+      try {
+        const body: TokenVerifyRequest = await request.json();
+        if (body.token) {
+          token = body.token;
+          console.log('✅ 从请求体获取token');
+        }
+      } catch (error) {
+        // 忽略JSON解析错误，继续检查其他来源
+        console.log('⚠️ 请求体不是有效JSON，跳过');
+      }
+    }
 
-    // 验证必需字段
-    if (!body.token) {
+    // 验证是否获取到token
+    if (!token) {
       return NextResponse.json(
-        { success: false, error: '缺少Token参数' },
+        { success: false, error: '缺少Token参数，请在Authorization header或请求体中提供' },
         { status: 400 }
       );
     }
 
     // 1. 验证JWT token
-    const tokenResult = await verifyJWTToken(body.token);
+    const tokenResult = await verifyJWTToken(token);
 
     if (!tokenResult.valid) {
       console.log('❌ Token验证失败:', tokenResult.error);

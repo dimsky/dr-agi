@@ -5,17 +5,18 @@
 
 // 配置常量
 const CONFIG = {
-  // 后端API地址 - 根据实际部署环境调整
-  API_BASE_URL: 'https://your-domain.com/api',  // 需要替换为实际域名
+  // 请求超时时间
+  REQUEST_TIMEOUT: 10000,
   // 本地存储键名
   STORAGE_KEYS: {
-    TOKEN: 'auth_token',
+    TOKEN: 'access_token',
     USER_INFO: 'user_info',
     LOGIN_STATUS: 'login_status'
-  },
-  // 请求超时时间
-  REQUEST_TIMEOUT: 10000
+  }
 };
+
+// 获取APP实例和配置
+const app = getApp();
 
 Component({
   properties: {
@@ -28,12 +29,23 @@ Component({
     buttonClass: {
       type: String,
       value: ''
+    },
+    // 是否支持手机号获取
+    enablePhoneNumber: {
+      type: Boolean,
+      value: true
+    },
+    // 登录模式：'both' | 'phone-first' | 'wechat-only'
+    loginMode: {
+      type: String,
+      value: 'both'
     }
   },
 
   data: {
     isLoggedIn: false,     // 登录状态
     isLoading: false,      // 加载状态
+    loginType: 'normal',   // 'normal' | 'withPhone'
     userInfo: null,        // 用户信息
     authToken: null        // 认证令牌
   },
@@ -86,7 +98,7 @@ Component({
     async verifyTokenValid(token) {
       try {
         const response = await this.requestAsync({
-          url: `${CONFIG.API_BASE_URL}/auth/verify`,
+          url: `${app.globalData.apiBaseUrl}/api/auth/verify`,
           method: 'POST',
           header: {
             'Authorization': `Bearer ${token}`,
@@ -104,46 +116,32 @@ Component({
     },
 
     /**
-     * 处理微信登录
+     * 处理微信登录（普通方式）
      */
     async handleWeChatLogin() {
       if (this.data.isLoading) {
         return;
       }
 
-      this.setData({ isLoading: true });
+      this.setData({ 
+        isLoading: true,
+        loginType: 'normal'
+      });
 
       try {
-        console.log('🚀 开始微信登录流程...');
+        console.log('🚀 开始普通微信登录流程...');
 
         // 第一步：获取微信登录code
         const loginCode = await this.getWeChatLoginCode();
         console.log('✅ 获取微信登录code成功');
 
-        // 第二步：获取用户信息
-        const userProfile = await this.getWeChatUserProfile();
-        console.log('✅ 获取用户信息成功:', userProfile);
-
-        // 第三步：调用后端API完成登录
-        const loginResult = await this.callLoginAPI(loginCode, userProfile);
+        // 第二步：调用后端API完成登录（不包含手机号）
+        const loginResult = await this.callLoginAPI(loginCode);
         console.log('✅ 后端登录成功:', loginResult);
 
-        // 第四步：保存登录信息到本地
+        // 第三步：保存登录信息
         await this.saveAuthData(loginResult);
-        console.log('✅ 登录信息保存成功');
-
-        // 更新组件状态
-        this.setData({
-          isLoggedIn: true,
-          userInfo: loginResult.user,
-          authToken: loginResult.token
-        });
-
-        // 触发登录成功事件
-        this.triggerEvent('loginSuccess', {
-          user: loginResult.user,
-          token: loginResult.token
-        });
+        this.updateLoginState(loginResult);
 
         // 显示成功提示
         wx.showToast({
@@ -158,6 +156,87 @@ Component({
       } finally {
         this.setData({ isLoading: false });
       }
+    },
+
+    /**
+     * 处理手机号授权登录（按照新流程：phoneCode → 获取手机号 → wx.login → 登录）
+     */
+    async handlePhoneLogin(e) {
+      console.log('📱 开始手机号授权登录流程...', e.detail);
+      
+      if (this.data.isLoading) {
+        return;
+      }
+
+      // 检查用户是否同意授权
+      if (!e.detail.code) {
+        wx.showToast({
+          title: '需要获取手机号才能继续',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+
+      this.setData({ 
+        isLoading: true,
+        loginType: 'withPhone'
+      });
+
+      try {
+        // 第一步：使用 phoneCode 调用 /api/auth/phone 获取手机号
+        const phoneCode = e.detail.code;
+        console.log('📱 第一步：使用 phoneCode 获取手机号...');
+        const phoneNumber = await this.getPhoneNumber(phoneCode);
+        console.log('✅ 成功获取手机号:', phoneNumber);
+
+        // 第二步：在获取手机号成功的回调中调用 wx.login() 获取 code
+        console.log('🔐 第二步：获取微信登录 code...');
+        const loginCode = await this.getWeChatLoginCode();
+        console.log('✅ 微信登录 code 获取成功');
+
+        // 第三步：调用 /api/auth/wechat 将 code 和手机号传递给后台完成登录
+        console.log('🚀 第三步：将 code 和手机号传递给后台完成登录...');
+        const loginResult = await this.callLoginAPI(loginCode, phoneNumber);
+        console.log('✅ 登录成功');
+
+        // 第四步：保存登录信息
+        await this.saveAuthData(loginResult);
+        
+        // 更新组件状态
+        this.updateLoginState(loginResult);
+
+        // 显示成功提示
+        wx.showToast({
+          title: '登录成功，已获取手机号',
+          icon: 'success',
+          duration: 2000
+        });
+
+      } catch (error) {
+        console.error('❌ 手机号授权登录失败:', error);
+        this.handleLoginError(error);
+      } finally {
+        this.setData({ isLoading: false });
+      }
+    },
+
+    /**
+     * 更新登录状态
+     */
+    updateLoginState(loginResult) {
+      this.setData({
+        isLoggedIn: true,
+        userInfo: loginResult.user,
+        authToken: loginResult.token
+      });
+
+      // 触发登录成功事件
+      this.triggerEvent('loginSuccess', {
+        user: loginResult.user,
+        token: loginResult.token,
+        hasPhoneNumber: !!loginResult.user.phoneNumber
+      });
     },
 
     /**
@@ -181,49 +260,22 @@ Component({
     },
 
     /**
-     * 获取微信用户信息
+     * 调用后端登录API（支持传递手机号）
      */
-    getWeChatUserProfile() {
-      return new Promise((resolve, reject) => {
-        wx.getUserProfile({
-          desc: '用于完善用户资料',
-          success: (result) => {
-            if (result.userInfo) {
-              resolve(result.userInfo);
-            } else {
-              reject(new Error('获取用户信息失败'));
-            }
-          },
-          fail: (error) => {
-            reject(new Error(`获取用户信息失败: ${error.errMsg}`));
-          }
-        });
-      });
-    },
-
-    /**
-     * 调用后端登录API
-     */
-    async callLoginAPI(code, userInfo) {
+    async callLoginAPI(code, phoneNumber = null) {
       try {
+        const requestData = { code };
+        if (phoneNumber) {
+          requestData.phoneNumber = phoneNumber;
+        }
+
         const response = await this.requestAsync({
-          url: `${CONFIG.API_BASE_URL}/auth/wechat`,
+          url: `${app.globalData.apiBaseUrl}/api/auth/wechat`,
           method: 'POST',
           header: {
             'Content-Type': 'application/json'
           },
-          data: {
-            code: code,
-            userInfo: {
-              nickName: userInfo.nickName,
-              avatarUrl: userInfo.avatarUrl,
-              gender: userInfo.gender,
-              city: userInfo.city,
-              province: userInfo.province,
-              country: userInfo.country,
-              language: userInfo.language
-            }
-          }
+          data: requestData
         });
 
         const result = response.data;
@@ -236,6 +288,35 @@ Component({
       } catch (error) {
         if (error.statusCode) {
           throw new Error(`登录请求失败 (${error.statusCode}): ${error.data?.error || '网络错误'}`);
+        }
+        throw error;
+      }
+    },
+
+    /**
+     * 获取用户手机号
+     */
+    async getPhoneNumber(phoneCode) {
+      try {
+        const response = await this.requestAsync({
+          url: `${app.globalData.apiBaseUrl}/api/auth/phone`,
+          method: 'POST',
+          header: {
+            'Content-Type': 'application/json'
+          },
+          data: { phoneCode }
+        });
+
+        const result = response.data;
+
+        if (result.success && result.phoneNumber) {
+          return result.phoneNumber;
+        } else {
+          throw new Error(result.error || '获取手机号失败');
+        }
+      } catch (error) {
+        if (error.statusCode) {
+          throw new Error(`获取手机号失败 (${error.statusCode}): ${error.data?.error || '网络错误'}`);
         }
         throw error;
       }
@@ -255,6 +336,53 @@ Component({
     },
 
     /**
+     * 更新用户手机号
+     */
+    async updateUserPhoneNumber(phoneCode) {
+      try {
+        const token = await this.getStorageAsync(CONFIG.STORAGE_KEYS.TOKEN);
+        if (!token) {
+          throw new Error('未找到登录token');
+        }
+
+        const response = await this.requestAsync({
+          url: `${app.globalData.apiBaseUrl}/api/auth/phone`,
+          method: 'POST',
+          header: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          data: { phoneCode }
+        });
+
+        const result = response.data;
+
+        if (result.success && result.phoneNumber) {
+          // 更新本地存储的用户信息
+          const userInfo = await this.getStorageAsync(CONFIG.STORAGE_KEYS.USER_INFO);
+          if (userInfo) {
+            userInfo.phoneNumber = result.phoneNumber;
+            await this.setStorageAsync(CONFIG.STORAGE_KEYS.USER_INFO, userInfo);
+            
+            // 更新组件状态
+            this.setData({
+              userInfo: userInfo
+            });
+          }
+          
+          return result;
+        } else {
+          throw new Error(result.error || '更新手机号失败');
+        }
+      } catch (error) {
+        if (error.statusCode) {
+          throw new Error(`更新手机号失败 (${error.statusCode}): ${error.data?.error || '网络错误'}`);
+        }
+        throw error;
+      }
+    },
+
+    /**
      * 处理登录错误
      */
     handleLoginError(error) {
@@ -268,6 +396,8 @@ Component({
         errorMessage = '网络连接失败，请检查网络后重试';
       } else if (error.message.includes('401') || error.message.includes('403')) {
         errorMessage = '登录授权失败，请重试';
+      } else if (error.message.includes('获取手机号')) {
+        errorMessage = error.message; // 直接使用手机号相关的错误信息
       }
 
       wx.showToast({

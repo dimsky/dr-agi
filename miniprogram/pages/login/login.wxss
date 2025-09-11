@@ -44,48 +44,123 @@
 .app-desc {
   font-size: 28rpx;
   color: #666;
-  margin-bottom: 80rpx;
+  margin-bottom: 60rpx;
   line-height: 1.5;
+}
+
+/* 登录按钮区域 */
+.login-buttons {
+  margin-bottom: 40rpx;
 }
 
 .login-btn {
   width: 100%;
   height: 96rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: none;
   border-radius: 48rpx;
-  color: white;
   font-size: 32rpx;
   font-weight: bold;
+  margin-bottom: 24rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 40rpx;
-  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.3);
+  position: relative;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .login-btn:active {
   transform: translateY(2rpx);
-  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
 }
 
 .login-btn.loading {
   opacity: 0.7;
 }
 
-.wechat-icon {
-  width: 40rpx;
-  height: 40rpx;
-  margin-right: 16rpx;
-  background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEzLjUgN2E2LjUgNi41IDAgMDEwIDEzIDYuNSA2LjUgMCAwMS02LjUtNi41IDYuNDc4IDYuNDc4IDAgMDE2LjUtNi41eiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==') center/contain no-repeat;
+/* 主要登录按钮（手机号） */
+.login-btn.primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.3);
 }
 
+.login-btn.primary:active {
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
+}
+
+/* 次要登录按钮（微信） */
+.login-btn.secondary {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  border: 2rpx solid rgba(102, 126, 234, 0.3);
+}
+
+.login-btn.secondary:active {
+  background: rgba(102, 126, 234, 0.15);
+}
+
+/* 按钮内容 */
+.btn-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: relative;
+}
+
+.btn-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.btn-text {
+  flex: 1;
+  text-align: center;
+}
+
+.btn-tag {
+  position: absolute;
+  right: 20rpx;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 20rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  backdrop-filter: blur(10px);
+}
+
+/* 登录提示 */
+.login-tips {
+  margin-bottom: 40rpx;
+}
+
+.tip-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 16rpx;
+  padding: 0 20rpx;
+}
+
+.tip-icon {
+  font-size: 28rpx;
+  margin-right: 12rpx;
+  width: 32rpx;
+  text-align: center;
+}
+
+.tip-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.4;
+}
+
+/* 隐私协议 */
 .privacy-notice {
   font-size: 24rpx;
   color: #999;
   line-height: 1.5;
-  margin-top: 40rpx;
+  margin-top: 20rpx;
 }
 
 .privacy-link {
@@ -94,7 +169,7 @@
 }
 
 .loading-text {
-  margin-left: 16rpx;
+  opacity: 0.8;
 }
 
 /* 响应式设计 */
@@ -105,5 +180,13 @@
   
   .login-card {
     padding: 60rpx 40rpx;
+  }
+  
+  .app-desc {
+    margin-bottom: 40rpx;
+  }
+  
+  .login-tips {
+    margin-bottom: 30rpx;
   }
 }

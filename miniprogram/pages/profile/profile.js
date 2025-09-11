@@ -15,10 +15,7 @@ Page({
       avatarUrl: '',
       email: '',
       profession: '',
-      phone: '',
-      institution: '',
-      department: '',
-      position: ''
+      phone: ''
     },
     professionOptions: [
       '临床医生',
@@ -27,28 +24,6 @@ Page({
       '医技人员',
       '医院管理',
       '科研人员',
-      '医学生',
-      '其他'
-    ],
-    positionOptions: [
-      '主任医师',
-      '副主任医师',
-      '主治医师',
-      '住院医师',
-      '护士长',
-      '主管护师',
-      '护师',
-      '护士',
-      '主任药师',
-      '副主任药师',
-      '主管药师',
-      '药师',
-      '技师',
-      '主管技师',
-      '高级技师',
-      '科主任',
-      '副主任',
-      '主管',
       '医学生',
       '其他'
     ]
@@ -93,10 +68,7 @@ Page({
           avatarUrl: userInfo.avatarUrl || '',
           email: userInfo.email || '',
           profession: userInfo.profession || '',
-          phone: userInfo.phone || '',
-          institution: userInfo.institution || '',
-          department: userInfo.department || '',
-          position: userInfo.position || ''
+          phone: userInfo.phone || ''
         }
       });
     } else {
@@ -108,10 +80,43 @@ Page({
   },
 
   /**
+   * 登录状态变化回调 - 由app.js调用
+   */
+  onLoginStatusChange(isLoggedIn, userInfo) {
+    console.log('个人中心接收到登录状态变化:', { isLoggedIn, userInfo });
+    if (isLoggedIn && userInfo) {
+      this.setData({
+        userInfo: userInfo,
+        isLoggedIn: isLoggedIn,
+        formData: {
+          nickname: userInfo.nickname || '',
+          avatarUrl: userInfo.avatarUrl || '',
+          email: userInfo.email || '',
+          profession: userInfo.profession || '',
+          phone: userInfo.phone || ''
+        }
+      });
+    } else {
+      this.setData({
+        isLoggedIn: false,
+        userInfo: null,
+        isEditing: false,
+        formData: {
+          nickname: '',
+          avatarUrl: '',
+          email: '',
+          profession: '',
+          phone: ''
+        }
+      });
+    }
+  },
+
+  /**
    * 从服务器加载用户信息
    */
   loadUserInfo() {
-    const token = wx.getStorageSync('token');
+    const token = wx.getStorageSync('access_token');
     if (!token) {
       return Promise.resolve();
     }
@@ -120,7 +125,7 @@ Page({
 
     return new Promise((resolve, reject) => {
       wx.request({
-        url: `${app.globalData.baseUrl}/api/auth/verify`,
+        url: `${app.globalData.apiBaseUrl}/api/auth/verify`,
         method: 'POST',
         header: {
           'Authorization': `Bearer ${token}`
@@ -139,10 +144,7 @@ Page({
                 avatarUrl: userInfo.avatarUrl || '',
                 email: userInfo.email || '',
                 profession: userInfo.profession || '',
-                phone: userInfo.phone || '',
-                institution: userInfo.institution || '',
-                department: userInfo.department || '',
-                position: userInfo.position || ''
+                phone: userInfo.phone || ''
               }
             });
             resolve(userInfo);
@@ -196,14 +198,14 @@ Page({
    * 上传头像
    */
   uploadAvatar(filePath) {
-    const token = wx.getStorageSync('token');
+    const token = wx.getStorageSync('access_token');
     
     wx.showLoading({
       title: '上传中...'
     });
 
     wx.uploadFile({
-      url: `${app.globalData.baseUrl}/api/upload/avatar`,
+      url: `${app.globalData.apiBaseUrl}/api/upload/avatar`,
       filePath: filePath,
       name: 'avatar',
       header: {
@@ -267,18 +269,6 @@ Page({
   },
 
   /**
-   * 选择职位
-   */
-  onPositionChange(event) {
-    const index = event.detail.value;
-    const position = this.data.positionOptions[index];
-    
-    this.setData({
-      'formData.position': position
-    });
-  },
-
-  /**
    * 切换编辑模式
    */
   onToggleEdit() {
@@ -306,10 +296,7 @@ Page({
         avatarUrl: userInfo.avatarUrl || '',
         email: userInfo.email || '',
         profession: userInfo.profession || '',
-        phone: userInfo.phone || '',
-        institution: userInfo.institution || '',
-        department: userInfo.department || '',
-        position: userInfo.position || ''
+        phone: userInfo.phone || ''
       }
     });
   },
@@ -323,7 +310,7 @@ Page({
       return;
     }
 
-    const token = wx.getStorageSync('token');
+    const token = wx.getStorageSync('access_token');
     if (!token) {
       wx.showToast({
         title: '请先登录',
@@ -337,8 +324,8 @@ Page({
     });
 
     wx.request({
-      url: `${app.globalData.baseUrl}/api/user/profile`,
-      method: 'PUT',
+      url: `${app.globalData.apiBaseUrl}/api/users/profile`,
+      method: 'POST',
       header: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -346,8 +333,8 @@ Page({
       data: this.data.formData,
       success: (res) => {
         if (res.statusCode === 200 && res.data.success) {
-          // 更新全局用户信息
-          const updatedUserInfo = { ...this.data.userInfo, ...this.data.formData };
+          // 更新全局用户信息 - API返回的数据在data.user中
+          const updatedUserInfo = res.data.data.user;
           app.globalData.userInfo = updatedUserInfo;
           
           this.setData({
@@ -361,7 +348,7 @@ Page({
           });
         } else {
           wx.showToast({
-            title: res.data.error || '保存失败',
+            title: res.data.message || '保存失败',
             icon: 'error'
           });
         }
@@ -488,41 +475,8 @@ Page({
       cancelText: '取消',
       success: (res) => {
         if (res.confirm) {
-          // 清除本地存储
-          wx.removeStorageSync('token');
-          
-          // 清除全局数据
-          app.globalData.userInfo = null;
-          app.globalData.isLoggedIn = false;
-          
-          // 更新页面状态
-          this.setData({
-            userInfo: null,
-            isLoggedIn: false,
-            isEditing: false,
-            formData: {
-              nickname: '',
-              avatarUrl: '',
-              email: '',
-              profession: '',
-              phone: '',
-              institution: '',
-              department: '',
-              position: ''
-            }
-          });
-
-          wx.showToast({
-            title: '已退出登录',
-            icon: 'success'
-          });
-
-          // 可选：跳转到首页
-          setTimeout(() => {
-            wx.switchTab({
-              url: '/pages/index/index'
-            });
-          }, 1500);
+          // 调用app统一的退出登录方法
+          app.logout();
         }
       }
     });

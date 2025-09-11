@@ -36,6 +36,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthenticatedFetch } from '@/hooks/use-auth';
 
 interface AddServiceButtonProps {
   className?: string;
@@ -80,6 +81,7 @@ interface ServiceData {
 export function AddServiceButton({ className, children }: AddServiceButtonProps) {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const authenticatedFetch = useAuthenticatedFetch();
   
   const form = useForm<AddServiceFormData>({
     resolver: zodResolver(addServiceSchema),
@@ -98,12 +100,11 @@ export function AddServiceButton({ className, children }: AddServiceButtonProps)
   // 创建服务的mutation
   const createServiceMutation = useMutation({
     mutationFn: async (data: AddServiceFormData): Promise<ServiceData> => {
-      const response = await fetch('/api/services', {
+      const response = await authenticatedFetch('/api/services', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // 确保包含cookies
         body: JSON.stringify({
           displayName: data.displayName,
           description: data.description || null,

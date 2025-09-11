@@ -17,7 +17,7 @@
     <view wx:if="{{isLoggedIn}}" class="user-info-section">
       <view class="user-avatar">👨‍⚕️</view>
       <view class="user-details">
-        <view class="user-greeting">您好，{{userInfo.name || '医生'}}</view>
+        <view class="user-greeting">您好，{{userInfo.nickname || '医生'}}</view>
         <view class="user-subtitle">欢迎回到医疗服务平台</view>
       </view>
       <view class="user-actions">

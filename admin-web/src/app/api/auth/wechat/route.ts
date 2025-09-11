@@ -4,12 +4,13 @@ import { getWeChatAuthService } from '@/services/wechat-auth';
 // 请求体接口
 interface WeChatLoginRequest {
   code: string;
+  phoneNumber?: string; // 可选的手机号参数
 }
 
 // 响应接口
 interface LoginResponse {
   success: boolean;
-  token?: string;
+  token?: string;  
   user?: {
     id: string;
     nickname: string;
@@ -42,22 +43,42 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     // 使用 WeChatAuthService 处理登录
     const authService = getWeChatAuthService();
     
-    // 直接使用授权码登录，不传递用户信息
+    // 基础登录
     const result = await authService.login(body.code);
 
-    console.log('✅ 微信登录成功:', { userId: result.user.id, nickname: result.user.nickname });
+    // 构建响应用户对象
+    const responseUser = {
+      id: result.user.id,
+      nickname: result.user.nickname || '',
+      avatarUrl: result.user.avatarUrl || '',
+      openId: result.user.openId,
+      phoneNumber: undefined as string | undefined,
+    };
+
+    // 如果提供了手机号，更新用户手机号
+    if (body.phoneNumber) {
+      try {
+        await authService.updateUserPhoneNumber(result.user.id, body.phoneNumber);
+        console.log('✅ 成功更新用户手机号:', body.phoneNumber);
+        
+        // 更新响应用户信息中的手机号
+        responseUser.phoneNumber = body.phoneNumber;
+      } catch (error) {
+        console.error('⚠️ 更新手机号失败，但登录成功:', error);
+      }
+    }
+
+    console.log('✅ 微信登录成功:', { 
+      userId: result.user.id, 
+      nickname: result.user.nickname,
+      hasPhoneNumber: !!body.phoneNumber 
+    });
 
     // 返回成功响应
     return NextResponse.json({
       success: true,
       token: result.token,
-      user: {
-        id: result.user.id,
-        nickname: result.user.nickname || '',
-        avatarUrl: result.user.avatarUrl || '',
-        openId: result.user.openId,
-        role: result.user.role, // 添加用户角色信息
-      },
+      user: responseUser,
     });
 
   } catch (error) {
@@ -89,6 +110,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<LoginResp
     );
   }
 }
+
 
 /**
  * GET /api/auth/wechat

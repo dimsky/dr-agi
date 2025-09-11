@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useAuthenticatedFetch } from './use-auth'
 import { AiService, UpdateAiServiceInput } from '../db/schema/ai_service'
 
 // API 响应类型
@@ -47,6 +48,8 @@ interface DifyWorkflowTestResult {
 
 // 服务配置列表查询 hook
 export function useServiceConfigs(params?: ServiceConfigQueryParams) {
+  const authenticatedFetch = useAuthenticatedFetch();
+  
   return useQuery({
     queryKey: ['service-configs', params],
     queryFn: async (): Promise<ServiceConfigListResponse> => {
@@ -60,9 +63,7 @@ export function useServiceConfigs(params?: ServiceConfigQueryParams) {
       if (params?.sortBy) searchParams.append('sortBy', params.sortBy)
       if (params?.sortOrder) searchParams.append('sortOrder', params.sortOrder)
 
-      const response = await fetch(`/api/services?${searchParams}`, {
-        credentials: 'include', // 确保包含cookies
-      })
+      const response = await authenticatedFetch(`/api/services?${searchParams}`)
       
       if (!response.ok) {
         throw new Error(`获取服务配置列表失败: ${response.status}`)
@@ -83,14 +84,14 @@ export function useServiceConfigs(params?: ServiceConfigQueryParams) {
 
 // 单个服务配置查询 hook
 export function useServiceConfig(configId: string | null) {
+  const authenticatedFetch = useAuthenticatedFetch();
+  
   return useQuery({
     queryKey: ['service-configs', configId],
     queryFn: async (): Promise<AiService> => {
       if (!configId) throw new Error('服务配置ID不能为空')
 
-      const response = await fetch(`/api/services/${configId}`, {
-        credentials: 'include', // 确保包含cookies
-      })
+      const response = await authenticatedFetch(`/api/services/${configId}`)
       
       if (!response.ok) {
         throw new Error(`获取服务配置详情失败: ${response.status}`)
@@ -111,15 +112,15 @@ export function useServiceConfig(configId: string | null) {
 // 更新服务配置 hook
 export function useUpdateConfig() {
   const queryClient = useQueryClient()
+  const authenticatedFetch = useAuthenticatedFetch();
 
   return useMutation({
     mutationFn: async ({ configId, updates }: { configId: string; updates: UpdateAiServiceInput }) => {
-      const response = await fetch(`/api/services/${configId}`, {
+      const response = await authenticatedFetch(`/api/services/${configId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // 确保包含cookies
         body: JSON.stringify(updates),
       })
 
@@ -195,15 +196,15 @@ export function useUpdateConfig() {
 // 批量更新服务配置状态 hook
 export function useBatchUpdateConfigStatus() {
   const queryClient = useQueryClient()
+  const authenticatedFetch = useAuthenticatedFetch();
 
   return useMutation({
     mutationFn: async ({ configIds, isActive }: { configIds: string[]; isActive: boolean }) => {
-      const response = await fetch('/api/services/batch-update', {
+      const response = await authenticatedFetch('/api/services/batch-update', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // 确保包含cookies
         body: JSON.stringify({ configIds, updates: { isActive } }),
       })
 
@@ -228,6 +229,8 @@ export function useBatchUpdateConfigStatus() {
 
 // 测试 Dify 工作流 hook
 export function useTestWorkflow() {
+  const authenticatedFetch = useAuthenticatedFetch();
+  
   return useMutation({
     mutationFn: async ({ 
       configId, 
@@ -236,12 +239,11 @@ export function useTestWorkflow() {
       configId: string; 
       testData?: Record<string, unknown> 
     }): Promise<DifyWorkflowTestResult> => {
-      const response = await fetch(`/api/services/${configId}/test-workflow`, {
+      const response = await authenticatedFetch(`/api/services/${configId}/test-workflow`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // 确保包含cookies
         body: JSON.stringify({ testData }),
       })
 
@@ -267,15 +269,15 @@ export function useTestWorkflow() {
 // 创建新服务配置 hook
 export function useCreateServiceConfig() {
   const queryClient = useQueryClient()
+  const authenticatedFetch = useAuthenticatedFetch();
 
   return useMutation({
     mutationFn: async (newConfig: Omit<AiService, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>) => {
-      const response = await fetch('/api/services', {
+      const response = await authenticatedFetch('/api/services', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // 确保包含cookies
         body: JSON.stringify(newConfig),
       })
 
@@ -301,12 +303,12 @@ export function useCreateServiceConfig() {
 // 删除服务配置 hook (软删除)
 export function useDeleteServiceConfig() {
   const queryClient = useQueryClient()
+  const authenticatedFetch = useAuthenticatedFetch();
 
   return useMutation({
     mutationFn: async (configId: string) => {
-      const response = await fetch(`/api/services?id=${configId}`, {
+      const response = await authenticatedFetch(`/api/services?id=${configId}`, {
         method: 'DELETE',
-        credentials: 'include', // 确保包含cookies
       })
 
       if (!response.ok) {
@@ -362,6 +364,8 @@ export function useDeleteServiceConfig() {
 
 // 获取服务配置统计信息 hook
 export function useServiceConfigStats() {
+  const authenticatedFetch = useAuthenticatedFetch();
+  
   return useQuery({
     queryKey: ['service-configs', 'stats'],
     queryFn: async (): Promise<{
@@ -371,9 +375,7 @@ export function useServiceConfigStats() {
       withDifyConfig: number
       withoutDifyConfig: number
     }> => {
-      const response = await fetch('/api/services/stats', {
-        credentials: 'include', // 确保包含cookies
-      })
+      const response = await authenticatedFetch('/api/services/stats')
       
       if (!response.ok) {
         throw new Error(`获取服务配置统计失败: ${response.status}`)
@@ -399,6 +401,8 @@ export function useServiceConfigStats() {
 
 // 导出服务配置数据 hook
 export function useExportServiceConfigs() {
+  const authenticatedFetch = useAuthenticatedFetch();
+  
   return useMutation({
     mutationFn: async (params: ServiceConfigQueryParams & { format: 'csv' | 'excel' }) => {
       const searchParams = new URLSearchParams()
@@ -407,9 +411,7 @@ export function useExportServiceConfigs() {
       if (params.isActive !== undefined) searchParams.append('isActive', params.isActive.toString())
       if (params.format) searchParams.append('format', params.format)
 
-      const response = await fetch(`/api/services/export?${searchParams}`, {
-        credentials: 'include', // 确保包含cookies
-      })
+      const response = await authenticatedFetch(`/api/services/export?${searchParams}`)
       
       if (!response.ok) {
         throw new Error(`导出服务配置失败: ${response.status}`)

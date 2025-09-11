@@ -28,7 +28,25 @@ export interface WeChatSession {
 
 export interface WeChatLoginRequest {
   code: string;
+  phoneCode?: string; // 获取手机号的code
   userInfo?: WeChatUserInfo; // 微信已不再支持直接获取用户信息，改为可选
+}
+
+// 微信获取手机号接口类型定义
+export interface WeChatPhoneNumberInfo {
+  phoneNumber: string;
+  purePhoneNumber: string;
+  countryCode: string;
+  watermark: {
+    timestamp: number;
+    appid: string;
+  };
+}
+
+export interface WeChatPhoneNumberResponse {
+  errcode: number;
+  errmsg: string;
+  phone_info?: WeChatPhoneNumberInfo;
 }
 
 export interface LoginResponse {
@@ -39,6 +57,7 @@ export interface LoginResponse {
     nickname?: string; // 可选，因为微信不再直接提供
     avatarUrl?: string; // 可选，因为微信不再直接提供
     openId: string;
+    phoneNumber?: string; // 添加手机号字段
     role: UserRole; // 用户角色
   };
   error?: string;

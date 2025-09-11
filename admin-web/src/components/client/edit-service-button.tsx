@@ -36,6 +36,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthenticatedFetch } from '@/hooks/use-auth';
 
 // 从service-list中导入服务类型
 import type { MedicalServiceConfig } from './service-list';
@@ -83,6 +84,7 @@ interface ServiceData {
 export function EditServiceButton({ service, children }: EditServiceButtonProps) {
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const authenticatedFetch = useAuthenticatedFetch();
   
   const form = useForm<EditServiceFormData>({
     resolver: zodResolver(editServiceSchema),
@@ -115,12 +117,11 @@ export function EditServiceButton({ service, children }: EditServiceButtonProps)
   // 更新服务的mutation
   const updateServiceMutation = useMutation({
     mutationFn: async (data: EditServiceFormData): Promise<ServiceData> => {
-      const response = await fetch('/api/services', {
+      const response = await authenticatedFetch('/api/services', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'include',
         body: JSON.stringify({
           id: service.id,
           displayName: data.displayName,

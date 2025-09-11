@@ -3,6 +3,7 @@ App({
   onLaunch: function () {
     // 检查登录状态
     const token = wx.getStorageSync('access_token');
+    console.log("login-token", token)
     if (token) {
       // 验证token有效性
       this.verifyToken(token);
@@ -42,14 +43,19 @@ App({
         'Content-Type': 'application/json'
       },
       success: (res) => {
-        if (res.statusCode === 200 && res.data.success) {
-          this.globalData.userInfo = res.data.data.user;
+        console.log('token验证响应:', res.data);
+        if (res.statusCode === 200 && res.data.success && res.data.valid) {
+          this.globalData.userInfo = res.data.user;
           this.globalData.isLoggedIn = true;
           
+          // 通知所有页面登录状态已更新
+          this.notifyLoginStatusChange();
+          
           // 检查用户信息完整性
-          this.checkUserProfileCompleteness(res.data.data.user);
+          this.checkUserProfileCompleteness(res.data.user);
         } else {
           // token无效，清除本地存储
+          console.log('token验证失败:', res.data.error);
           this.clearLoginData();
         }
       },
@@ -60,6 +66,19 @@ App({
     });
   },
 
+  // 通知页面登录状态变化
+  notifyLoginStatusChange: function() {
+    // 获取当前页面栈
+    const pages = getCurrentPages();
+    if (pages.length > 0) {
+      const currentPage = pages[pages.length - 1];
+      // 如果当前页面有 onLoginStatusChange 方法，调用它
+      if (typeof currentPage.onLoginStatusChange === 'function') {
+        currentPage.onLoginStatusChange(this.globalData.isLoggedIn, this.globalData.userInfo);
+      }
+    }
+  },
+
   // 清除登录数据
   clearLoginData: function() {
     wx.removeStorageSync('access_token');
@@ -67,6 +86,9 @@ App({
     wx.removeStorageSync('user_info');
     this.globalData.userInfo = null;
     this.globalData.isLoggedIn = false;
+    
+    // 通知页面登录状态已更新
+    this.notifyLoginStatusChange();
   },
 
   // 退出登录
@@ -130,10 +152,21 @@ App({
 
   // 全局数据
   globalData: {
-    apiBaseUrl: 'http://localhost:3000', // 后端API地址，需要替换为实际域名
+    // 后端API地址 - 需要替换为实际的服务器域名
+    // 开发环境
+    apiBaseUrl: 'http://localhost:3000',
+    // 生产环境 - 取消注释并替换为实际域名
+    // apiBaseUrl: 'https://your-domain.com',
+    
     userInfo: null,
     isLoggedIn: false,
     systemInfo: null,
-    version: '1.0.0'
+    version: '1.0.0',
+    
+    // 功能开关
+    features: {
+      enablePhoneNumber: true, // 是否启用手机号获取
+      requirePhoneNumber: false, // 是否强制要求手机号
+    }
   }
 })

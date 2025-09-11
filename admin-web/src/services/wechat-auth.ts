@@ -45,6 +45,7 @@ class WeChatAuthService {
       throw this.createAuthError('INVALID_PARAMETER', '授权码不能为空');
     }
 
+    console.log("000000000000")
     const url = 'https://api.weixin.qq.com/sns/jscode2session';
     const params = new URLSearchParams({
       appid: this.appId,
@@ -206,7 +207,7 @@ class WeChatAuthService {
         role: user.role as UserRole, // 类型转换
         openId: user.openId,
         iss: 'wechat-medical-platform',
-        aud: 'wechat-miniprogram'
+        aud: 'miniprogram'
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -377,6 +378,28 @@ class WeChatAuthService {
    */
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * 更新用户手机号
+   * @param userId 用户ID
+   * @param phoneNumber 手机号
+   */
+  async updateUserPhoneNumber(userId: string, phoneNumber: string): Promise<void> {
+    try {
+      await db
+        .update(users)
+        .set({
+          phone: phoneNumber,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId));
+      
+      console.log('✅ 用户手机号更新成功:', { userId, phoneNumber });
+    } catch (error) {
+      console.error('❌ 更新用户手机号失败:', error);
+      throw this.createAuthError('DATABASE_ERROR', '更新用户手机号失败', error);
+    }
   }
 
   /**

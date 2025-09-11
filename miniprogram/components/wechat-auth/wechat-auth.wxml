@@ -3,18 +3,57 @@
     <view class="login-header">
       <image src="/images/wechat-logo.png" class="wechat-logo" mode="aspectFit"></image>
       <text class="welcome-text">欢迎使用医疗服务平台</text>
-      <text class="subtitle">请授权登录以获得完整服务</text>
+      <text class="subtitle">请选择登录方式以获得完整服务</text>
     </view>
     
     <view class="login-actions">
-      <button 
-        class="login-btn {{isLoading ? 'loading' : ''}}"
-        bindtap="handleWeChatLogin"
-        disabled="{{isLoading}}"
-        loading="{{isLoading}}"
-      >
-        {{isLoading ? '登录中...' : '一键微信登录'}}
-      </button>
+      <!-- 手机号快速登录按钮（推荐） -->
+      <block wx:if="{{enablePhoneNumber && (loginMode === 'both' || loginMode === 'phone-first')}}">
+        <button 
+          class="login-btn phone-login {{(isLoading && loginType === 'withPhone') ? 'loading' : ''}}"
+          open-type="getPhoneNumber"
+          bindgetphonenumber="handlePhoneLogin"
+          disabled="{{isLoading}}"
+        >
+          <view class="btn-content">
+            <view class="btn-icon">📱</view>
+            <view class="btn-text">
+              <text wx:if="{{!(isLoading && loginType === 'withPhone')}}">手机号快速登录</text>
+              <text wx:else class="loading-text">正在授权中...</text>
+            </view>
+            <view class="btn-tag">推荐</view>
+          </view>
+        </button>
+      </block>
+      
+      <!-- 普通微信登录按钮 -->
+      <block wx:if="{{loginMode === 'both' || loginMode === 'wechat-only'}}">
+        <button 
+          class="login-btn wechat-login {{(isLoading && loginType === 'normal') ? 'loading' : ''}}"
+          bindtap="handleWeChatLogin"
+          disabled="{{isLoading}}"
+        >
+          <view class="btn-content">
+            <view class="btn-icon">💚</view>
+            <view class="btn-text">
+              <text wx:if="{{!(isLoading && loginType === 'normal')}}">微信登录</text>
+              <text wx:else class="loading-text">登录中...</text>
+            </view>
+          </view>
+        </button>
+      </block>
+      
+      <!-- 登录说明 -->
+      <view wx:if="{{loginMode === 'both'}}" class="login-tips">
+        <view class="tip-item">
+          <text class="tip-icon">📱</text>
+          <text class="tip-text">手机号登录：安全便捷，享受更多服务</text>
+        </view>
+        <view class="tip-item">
+          <text class="tip-icon">💚</text>
+          <text class="tip-text">微信登录：快速登录，基础功能</text>
+        </view>
+      </view>
       
       <view class="privacy-notice">
         <text>登录即表示同意</text>
@@ -27,10 +66,11 @@
 
   <view wx:else class="user-info-section">
     <view class="user-avatar">
-      <image src="{{userInfo.avatarUrl}}" class="avatar" mode="aspectFill"></image>
+      <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" class="avatar" mode="aspectFill"></image>
     </view>
     <view class="user-details">
-      <text class="nickname">{{userInfo.nickname}}</text>
+      <text class="nickname">{{userInfo.nickname || '微信用户'}}</text>
+      <text wx:if="{{userInfo.phoneNumber}}" class="phone-number">📱 {{userInfo.phoneNumber}}</text>
       <text class="welcome-back">欢迎回来！</text>
     </view>
     <button class="logout-btn" bindtap="handleLogout">退出登录</button>

@@ -57,6 +57,17 @@ Page({
   },
 
   /**
+   * 登录状态变化回调 - 由app.js调用
+   */
+  onLoginStatusChange(isLoggedIn, userInfo) {
+    console.log('首页接收到登录状态变化:', { isLoggedIn, userInfo });
+    this.setData({
+      isLoggedIn: isLoggedIn,
+      userInfo: userInfo
+    });
+  },
+
+  /**
    * 加载页面数据
    */
   loadPageData() {

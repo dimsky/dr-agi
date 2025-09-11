@@ -5,7 +5,12 @@
     "minified": true,
     "uglifyFileName": false,
     "enhance": true,
-    "packNpmRelationList": [],
+    "packNpmRelationList": [
+      {
+        "packageJsonPath": "./package.json",
+        "miniprogramNpmDistDir": "./"
+      }
+    ],
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
@@ -14,14 +19,7 @@
     "useCompilerPlugins": false,
     "minifyWXML": true,
     "condition": false,
-    
-    "packNpmManually": true,
-    "packNpmRelationList": [
-      {
-        "packageJsonPath": "./package.json",
-        "miniprogramNpmDistDir": "./"
-      }
-    ]
+    "packNpmManually": true
   },
   "compileType": "miniprogram",
   "simulatorPluginLibVersion": {},
@@ -29,6 +27,6 @@
     "ignore": [],
     "include": []
   },
-  "appid": "wxa147264dc60b31c5",
+  "appid": "wxc58595bd46715ce6",
   "editorSetting": {}
 }

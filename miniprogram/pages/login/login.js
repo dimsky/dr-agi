@@ -3,7 +3,9 @@ const app = getApp()
 
 Page({
   data: {
-    isLoading: false
+    isLoading: false,
+    loginType: 'normal', // 'normal' | 'withPhone'
+    showPhoneOption: true // 是否显示手机号授权选项
   },
 
   /**
@@ -28,19 +30,22 @@ Page({
   },
 
   /**
-   * 微信登录按钮点击事件
+   * 微信登录按钮点击事件（不获取手机号）
    */
   async onLogin() {
-    console.log("开始登录流程")
+    console.log("开始普通登录流程")
     if (this.data.isLoading) return
 
-    this.setData({ isLoading: true })
+    this.setData({ 
+      isLoading: true,
+      loginType: 'normal'
+    })
 
     try {
       // 执行微信登录获取code
       const loginResult = await this.wxLogin()
       
-      // 发送登录请求到后端
+      // 发送登录请求到后端（不包含手机号）
       await this.loginToServer({
         code: loginResult.code
       })
@@ -61,6 +66,141 @@ Page({
   },
 
   /**
+   * 手机号授权登录（按照新流程：phoneCode → 获取手机号 → wx.login → 登录）
+   */
+  async onLoginWithPhone(e) {
+    console.log("开始手机号授权登录流程", e.detail)
+    
+    if (this.data.isLoading) return
+
+    // 检查用户是否同意授权
+    if (!e.detail.code) {
+      wx.showToast({
+        title: '需要获取手机号才能继续',
+        icon: 'none',
+        duration: 2000
+      })
+      return
+    }
+
+    this.setData({ 
+      isLoading: true,
+      loginType: 'withPhone'
+    })
+
+    try {
+      // 第一步：使用 phoneCode 调用 /api/auth/phone 获取手机号
+      const phoneCode = e.detail.code
+      console.log('📱 第一步：使用 phoneCode 获取手机号...')
+      const phoneNumber = await this.getPhoneNumber(phoneCode)
+      console.log('✅ 成功获取手机号:', phoneNumber)
+      
+      // 第二步：在获取手机号成功的回调中调用 wx.login() 获取 code
+      console.log('🔐 第二步：获取微信登录 code...')
+      const loginResult = await this.wxLogin()
+      console.log('✅ 微信登录 code 获取成功')
+      
+      // 第三步：调用 /api/auth/wechat 将 code 和手机号传递给后台完成登录
+      console.log('🚀 第三步：将 code 和手机号传递给后台完成登录...')
+      const loginResponse = await this.loginToServer({
+        code: loginResult.code,
+        phoneNumber: phoneNumber
+      })
+      console.log('✅ 登录成功')
+
+      // 显示手机号登录成功提示
+      wx.showToast({
+        title: '登录成功，已获取手机号',
+        icon: 'success',
+        duration: 2000
+      })
+
+      // 登录成功，检查用户信息完整性
+      await this.checkUserProfileCompleteness()
+
+    } catch (error) {
+      console.error('手机号授权登录失败:', error)
+      wx.showToast({
+        title: error.message || '登录失败，请重试',
+        icon: 'none',
+        duration: 2000
+      })
+    } finally {
+      this.setData({ isLoading: false })
+    }
+  },
+
+  /**
+   * 获取用户手机号
+   */
+  async getPhoneNumber(phoneCode) {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${app.globalData.apiBaseUrl}/api/auth/phone`,
+        method: 'POST',
+        data: { phoneCode },
+        header: {
+          'Content-Type': 'application/json'
+        },
+        success: (res) => {
+          if (res.statusCode === 200 && res.data.success) {
+            resolve(res.data.phoneNumber)
+          } else {
+            const errorMsg = res.data.error || '获取手机号失败'
+            reject(new Error(errorMsg))
+          }
+        },
+        fail: (err) => {
+          console.error('获取手机号请求失败:', err)
+          reject(new Error('网络连接失败，请检查网络后重试'))
+        }
+      })
+    })
+  },
+
+  /**
+   * 更新用户手机号（保留备用）
+   */
+  async updateUserPhoneNumber(phoneCode) {
+    return new Promise((resolve, reject) => {
+      const token = wx.getStorageSync('access_token')
+      if (!token) {
+        reject(new Error('未找到登录token'))
+        return
+      }
+
+      wx.request({
+        url: `${app.globalData.apiBaseUrl}/api/auth/phone`,
+        method: 'POST',
+        data: { phoneCode },
+        header: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        success: (res) => {
+          if (res.statusCode === 200 && res.data.success) {
+            // 更新本地存储的用户信息
+            let userInfo = wx.getStorageSync('user_info')
+            if (userInfo) {
+              userInfo.phoneNumber = res.data.phoneNumber
+              wx.setStorageSync('user_info', userInfo)
+              app.globalData.userInfo = userInfo
+            }
+            resolve(res.data)
+          } else {
+            const errorMsg = res.data.error || '更新手机号失败'
+            reject(new Error(errorMsg))
+          }
+        },
+        fail: (err) => {
+          console.error('更新手机号请求失败:', err)
+          reject(new Error('网络连接失败，请检查网络后重试'))
+        }
+      })
+    })
+  },
+
+  /**
    * 微信登录获取code
    */
   wxLogin() {
@@ -74,7 +214,7 @@ Page({
             reject(new Error('微信登录失败'))
           }
         },
-        fail: (err) => {
+        fail: () => {
           reject(new Error('微信登录失败'))
         }
       })
@@ -131,10 +271,13 @@ Page({
   },
 
   /**
-   * 向服务器发送登录请求
+   * 向服务器发送登录请求（支持传递手机号）
    */
   async loginToServer(data) {
     return new Promise((resolve, reject) => {
+      const loadingTitle = data.phoneNumber ? '正在登录并保存手机号...' : '正在登录...'
+      wx.showLoading({ title: loadingTitle })
+      
       wx.request({
         url: `${app.globalData.apiBaseUrl}/api/auth/wechat`,
         method: 'POST',
@@ -143,8 +286,11 @@ Page({
           'Content-Type': 'application/json'
         },
         success: (res) => {
+          wx.hideLoading()
+          
           if (res.statusCode === 200 && res.data.success) {
-            console.log(res.data)
+            console.log('登录成功:', res.data)
+            
             // 保存用户信息和token
             wx.setStorageSync('access_token', res.data.token)
             wx.setStorageSync('refresh_token', res.data.token)
@@ -154,12 +300,16 @@ Page({
             app.globalData.userInfo = res.data.user
             app.globalData.isLoggedIn = true
             
+            // 显示登录成功提示（不在这里显示，由调用方决定）
+            
             resolve(res.data)
           } else {
-            reject(new Error(res.data.message || '登录失败'))
+            const errorMsg = res.data.error || '登录失败'
+            reject(new Error(errorMsg))
           }
         },
         fail: (err) => {
+          wx.hideLoading()
           console.error('登录请求失败:', err)
           reject(new Error('网络连接失败，请检查网络后重试'))
         }
@@ -238,10 +388,5 @@ Page({
    */
   onShareAppMessage() {
 
-  },
-  getPhoneNumber (e) {
-    console.log(e.detail.code)  // 动态令牌
-    console.log(e.detail.errMsg) // 回调信息（成功失败都会返回）
-    console.log(e.detail.errno)  // 错误码（失败时返回）
   }
 })
